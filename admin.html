@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Админка программы</title>
+<link rel="stylesheet" href="assets/fonts/fonts.css">
+<style>
+:root {
+  --blue: #2450EC;
+  --blue-deep: #1433B8;
+  --blue-soft: #E9EEFE;
+  --red: #D00B12;
+  --red-soft: #FDECEC;
+  --green: #0E7A3A;
+  --green-soft: #E5F5EB;
+  --ink: #111114;
+  --ink-2: #4a4a55;
+  --paper: #f5f5f2;
+  --white: #fff;
+  --line: rgba(36, 80, 236, .25);
+  --f-display: "Oswald", "Arial Narrow", sans-serif;
+  --f-body: "Manrope", "Segoe UI", Arial, sans-serif;
+  --chamfer: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.45; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+
+.top { position: sticky; top: 0; z-index: 10; background: var(--white); border-bottom: 1px solid var(--line); }
+.top__in { max-width: 1440px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.brand { font-family: var(--f-display); font-weight: 700; text-transform: uppercase; color: var(--blue); font-size: 22px; line-height: 1; display: flex; align-items: center; gap: 10px; margin: 0; }
+.brand::before { content: ""; width: 8px; height: 24px; background: var(--red); transform: skewX(-20deg); }
+.brand small { font-size: 12px; letter-spacing: .15em; color: var(--ink-2); font-weight: 600; }
+.top__actions { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 0 16px; border: 2px solid var(--blue);
+  font-family: var(--f-display); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; font-size: 14px;
+  background: var(--white); color: var(--blue); transition: background .15s, color .15s;
+}
+.btn:hover { background: var(--blue-soft); }
+.btn--primary { background: var(--blue); color: var(--white); clip-path: var(--chamfer); }
+.btn--primary:hover { background: var(--blue-deep); }
+.btn--ghost { border-color: transparent; color: var(--ink-2); }
+.btn:disabled { opacity: .45; cursor: default; }
+
+.wrap { max-width: 1440px; margin: 0 auto; padding: 24px; }
+.status { font-size: 14px; font-weight: 600; padding: 6px 12px; }
+.status--ok { color: var(--green); background: var(--green-soft); }
+.status--warn { color: #8a5a00; background: #fff3d6; }
+.status--err { color: var(--red); background: var(--red-soft); }
+
+/* вход */
+.login { max-width: 640px; margin: 48px auto; background: var(--white); padding: 32px; border-top: 6px solid var(--blue); }
+.login h1 { font-family: var(--f-display); text-transform: uppercase; color: var(--blue); font-size: 32px; line-height: 1.1; margin: 0 0 8px; }
+.login p { color: var(--ink-2); margin: 0 0 20px; }
+.field { display: grid; gap: 6px; margin-bottom: 16px; }
+.field label { font-weight: 700; font-size: 14px; }
+.field input[type=password], .field input[type=text] { min-height: 46px; padding: 0 12px; border: 2px solid var(--line); background: var(--white); }
+.field input:focus { border-color: var(--blue); outline: none; }
+.check { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; font-size: 14px; }
+.login__row { display: flex; gap: 10px; flex-wrap: wrap; }
+details { margin-top: 24px; font-size: 14px; color: var(--ink-2); }
+summary { cursor: pointer; font-weight: 700; color: var(--blue); }
+details ol { padding-left: 20px; }
+details li { margin: 4px 0; }
+
+/* редактор */
+.meta { display: flex; gap: 16px 28px; align-items: end; flex-wrap: wrap; margin-bottom: 16px; }
+.meta .field { margin: 0; }
+.meta input[type=date], .meta select { min-height: 42px; padding: 0 10px; border: 2px solid var(--line); background: var(--white); }
+.counter { color: var(--ink-2); font-size: 14px; }
+.issues { margin: 0 0 16px; padding: 12px 16px 12px 36px; background: var(--red-soft); color: var(--red); font-size: 14px; font-weight: 600; }
+.issues[hidden] { display: none; }
+
+.table-wrap { background: var(--white); border-top: 4px solid var(--blue); overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 1080px; }
+th { text-align: left; font-family: var(--f-display); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; font-size: 12px; color: var(--ink-2); padding: 10px 8px; border-bottom: 2px solid var(--blue-soft); background: var(--white); }
+td { padding: 6px 8px; border-bottom: 1px solid var(--blue-soft); vertical-align: top; }
+tr.is-hidden { display: none; }
+td input, td select { width: 100%; min-height: 40px; padding: 0 8px; border: 1px solid #d6dbea; background: var(--white); }
+td input:focus, td select:focus { border-color: var(--blue); outline: none; box-shadow: 0 0 0 2px var(--blue-soft); }
+td .other { margin-top: 6px; }
+td .other[hidden] { display: none; }
+td.bad input, td.bad select { border-color: var(--red); background: var(--red-soft); }
+.col-time { width: 104px; }
+.col-kind { width: 170px; }
+.col-place { width: 240px; }
+.col-del { width: 48px; }
+.del { width: 40px; height: 40px; border: 0; background: none; color: var(--ink-2); display: grid; place-items: center; }
+.del:hover { color: var(--red); background: var(--red-soft); }
+.ico { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.empty { padding: 32px; text-align: center; color: var(--ink-2); }
+.add-row { margin-top: 12px; }
+.hint { color: var(--ink-2); font-size: 13px; margin: 16px 0 0; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top__in">
+    <p class="brand">Программа форума <small>админка</small></p>
+    <div class="top__actions" id="actions" hidden>
+      <span class="status" id="status"></span>
+      <button type="button" class="btn" id="btnDownload" title="Скачать файл программы на компьютер">Скачать файл</button>
+      <button type="button" class="btn" id="btnReload">Загрузить заново</button>
+      <button type="button" class="btn btn--primary" id="btnSave">Сохранить</button>
+      <button type="button" class="btn btn--ghost" id="btnLogout">Выйти</button>
+    </div>
+  </div>
+</header>
+
+<!-- ===== Вход ===== -->
+<section class="login" id="login">
+  <h1>Вход в админку</h1>
+  <p>Здесь организаторы заполняют программу: какая лекция, когда и в каком зале. После сохранения программа попадает на сайт через 1–2 минуты.</p>
+  <form id="loginForm">
+    <div class="field">
+      <label for="token">Ключ доступа GitHub</label>
+      <input type="password" id="token" autocomplete="off" required placeholder="github_pat_…">
+    </div>
+    <label class="check"><input type="checkbox" id="remember" checked> Запомнить на этом компьютере</label>
+    <div class="login__row">
+      <button type="submit" class="btn btn--primary">Войти</button>
+      <button type="button" class="btn" id="btnLocal">Без входа — только скачать файл</button>
+    </div>
+    <p class="status status--err" id="loginError" hidden style="margin-top:16px"></p>
+  </form>
+  <details>
+    <summary>Где взять ключ доступа</summary>
+    <ol>
+      <li>Владелец репозитория открывает <b>github.com → Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token</b>.</li>
+      <li>Repository access: <b>Only select repositories</b> → <b>forum-navigation</b>.</li>
+      <li>Permissions → Repository permissions → <b>Contents: Read and write</b>. Больше ничего не нужно.</li>
+      <li>Срок действия — до окончания форума. Ключ передаётся организаторам лично, не в общий чат.</li>
+    </ol>
+    <p>Ключ хранится только в браузере этого компьютера и отправляется только на api.github.com.</p>
+  </details>
+</section>
+
+<!-- ===== Редактор ===== -->
+<main class="wrap" id="editor" hidden>
+  <div class="meta">
+    <div class="field">
+      <label for="evDate">Дата форума</label>
+      <input type="date" id="evDate">
+    </div>
+    <div class="field">
+      <label for="filter">Показать</label>
+      <select id="filter"></select>
+    </div>
+    <span class="counter" id="counter"></span>
+  </div>
+
+  <ul class="issues" id="issues" hidden></ul>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="col-time">Начало</th>
+          <th class="col-time">Конец</th>
+          <th class="col-kind">Формат</th>
+          <th>Название</th>
+          <th>Спикер</th>
+          <th class="col-place">Место</th>
+          <th class="col-del"><span class="sr" hidden>Удалить</span></th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div class="empty" id="empty" hidden>Пока ни одной записи. Нажмите «Добавить лекцию».</div>
+  </div>
+  <button type="button" class="btn add-row" id="btnAdd">+ Добавить лекцию</button>
+  <p class="hint">Записи автоматически сортируются по времени при сохранении. Если одно и то же место занято двумя лекциями одновременно, админка предупредит.</p>
+</main>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></symbol>
+</svg>
+
+<script src="data/rooms.js"></script>
+<script src="data/schedule.js"></script>
+<script>
+/* Куда сохраняется программа */
+const REPO = { owner: 'Denis-Kharchenko', repo: 'forum-navigation', branch: 'main', path: 'data/schedule.js' };
+const API = `https://api.github.com/repos/${REPO.owner}/${REPO.repo}/contents/${REPO.path}`;
+const TOKEN_KEY = 'forum-admin-token';
+const KINDS = ['Лекция', 'Кейс-лекция', 'Мастер-класс', 'Тренинг', 'Воркшоп', 'Пленарная сессия', 'Дискуссия', 'Общее'];
+const OTHER = '__other';
+
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const toMin = t => { const [h, m] = String(t).split(':').map(Number); return h * 60 + m; };
+
+// Места, которые можно выбрать: помещения с list: true из data/rooms.js
+const PLACES = ROOMS.filter(r => r.list).map(r => ({
+  id: r.id, floor: r.floor,
+  name: [...(r.t1 || [])].join(' ').replace('- ', '') + (r.t2 && r.type === 'hall' ? ' · ' + r.t2.join(' ') : ''),
+}));
+const placeName = it => it.room ? (PLACES.find(p => p.id === it.room)?.name || it.room) : (it.place || '');
+
+let token = null, sha = null, dirty = false, mode = 'api';
+
+/* ---------- Статус ---------- */
+function setStatus(text, kind = 'ok') {
+  const s = $('#status');
+  s.textContent = text; s.className = 'status status--' + kind; s.hidden = !text;
+}
+function setDirty(v) {
+  dirty = v;
+  if (v) setStatus('Есть несохранённые изменения', 'warn');
+}
+window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+
+/* ---------- Кодирование файла ---------- */
+function b64encode(str) {
+  const bytes = new TextEncoder().encode(str);
+  let bin = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  return btoa(bin);
+}
+function b64decode(b64) {
+  const bin = atob(b64.replace(/\s/g, ''));
+  return new TextDecoder().decode(Uint8Array.from(bin, c => c.charCodeAt(0)));
+}
+function parseFile(text) {
+  const json = text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1);
+  return JSON.parse(json);
+}
+function buildFile(data) {
+  const items = data.items.map(it => '    ' + JSON.stringify(it)).join(',\n');
+  return `/* Программа форума. Файл записывает админка (admin.html) — вручную лучше не править. */
+window.FORUM_SCHEDULE = {
+  "date": ${JSON.stringify(data.date)},
+  "updated": ${JSON.stringify(new Date().toISOString())},
+  "items": [
+${items}
+  ]
+};
+`;
+}
+
+/* ---------- GitHub API ---------- */
+async function gh(method, body) {
+  const res = await fetch(method === 'GET' ? `${API}?ref=${REPO.branch}&t=${Date.now()}` : API, {
+    method,
+    headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' },
+    body: body ? JSON.stringify(body) : undefined,
+    cache: 'no-store',
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) { const err = new Error(data.message || res.statusText); err.status = res.status; throw err; }
+  return data;
+}
+const explain = e =>
+  e.status === 401 ? 'Ключ не подошёл или устарел. Попросите новый у владельца репозитория.' :
+  e.status === 403 || e.status === 404 ? 'У ключа нет доступа к репозиторию forum-navigation (нужно право Contents: Read and write).' :
+  e.status === 409 || e.status === 422 ? 'Пока вы редактировали, программу сохранил кто-то другой.' :
+  'Ошибка связи с GitHub: ' + e.message;
+
+async function loadRemote() {
+  setStatus('Загрузка…', 'warn');
+  const file = await gh('GET');
+  sha = file.sha;
+  fill(parseFile(b64decode(file.content)));
+  setDirty(false);
+  setStatus('Загружена актуальная версия', 'ok');
+}
+
+/* ---------- Таблица ---------- */
+function placeSelect(it) {
+  const byFloor = f => PLACES.filter(p => p.floor === f)
+    .map(p => `<option value="${p.id}"${it.room === p.id ? ' selected' : ''}>${esc(p.name)}</option>`).join('');
+  const isOther = !it.room && it.place;
+  return `<select data-f="room">
+      <option value=""${!it.room && !it.place ? ' selected' : ''}>— выберите —</option>
+      <optgroup label="1 этаж">${byFloor(1)}</optgroup>
+      <optgroup label="2 этаж">${byFloor(2)}</optgroup>
+      <option value="${OTHER}"${isOther ? ' selected' : ''}>Другое место…</option>
+    </select>
+    <input class="other" data-f="place" placeholder="Например: Лобби" value="${esc(it.place)}"${isOther ? '' : ' hidden'}>`;
+}
+function rowHTML(it = {}) {
+  return `<tr>
+    <td><input type="time" data-f="start" value="${esc(it.start)}" required></td>
+    <td><input type="time" data-f="end" value="${esc(it.end)}"></td>
+    <td><select data-f="kind">${KINDS.map(k => `<option${(it.kind || 'Лекция') === k ? ' selected' : ''}>${k}</option>`).join('')}</select></td>
+    <td><input data-f="title" value="${esc(it.title)}" placeholder="Название лекции" required></td>
+    <td><input data-f="speaker" value="${esc(it.speaker)}" placeholder="Имя, должность"></td>
+    <td>${placeSelect(it)}</td>
+    <td><button type="button" class="del" aria-label="Удалить запись"><svg class="ico"><use href="#i-trash"/></svg></button></td>
+  </tr>`;
+}
+function fill(data) {
+  $('#evDate').value = data.date || '';
+  $('#rows').innerHTML = (data.items || []).map(rowHTML).join('');
+  refresh();
+}
+function readRow(tr) {
+  const v = f => tr.querySelector(`[data-f="${f}"]`).value.trim();
+  const room = v('room');
+  return {
+    start: v('start'), end: v('end'), kind: v('kind'), title: v('title'), speaker: v('speaker'),
+    room: room === OTHER ? '' : room,
+    place: room === OTHER ? v('place') : '',
+  };
+}
+const readAll = () => ({ date: $('#evDate').value, items: $$('#rows tr').map(readRow) });
+
+/* ---------- Проверки ---------- */
+function validate() {
+  const rows = $$('#rows tr'), items = rows.map(readRow), issues = [];
+  rows.forEach(tr => tr.querySelectorAll('td').forEach(td => td.classList.remove('bad')));
+  const mark = (i, f) => rows[i].querySelector(`[data-f="${f}"]`).closest('td').classList.add('bad');
+  items.forEach((it, i) => {
+    const n = `Строка ${i + 1}`;
+    if (!it.start) { mark(i, 'start'); issues.push(`${n}: не указано время начала`); }
+    if (!it.title) { mark(i, 'title'); issues.push(`${n}: не указано название`); }
+    if (it.start && it.end && toMin(it.end) <= toMin(it.start)) { mark(i, 'end'); issues.push(`${n}: конец раньше начала`); }
+    if (!it.room && !it.place) { mark(i, 'room'); issues.push(`${n}: не выбрано место`); }
+  });
+  // Пересечения в одном зале
+  items.forEach((a, i) => items.forEach((b, j) => {
+    if (j <= i || !a.room || a.room !== b.room || !a.start || !b.start) return;
+    const a1 = toMin(a.start), a2 = a.end ? toMin(a.end) : a1 + 1, b1 = toMin(b.start), b2 = b.end ? toMin(b.end) : b1 + 1;
+    if (a1 < b2 && b1 < a2) {
+      mark(i, 'room'); mark(j, 'room');
+      issues.push(`Строки ${i + 1} и ${j + 1}: «${placeName(a)}» занят в одно время`);
+    }
+  }));
+  $('#issues').innerHTML = issues.map(t => `<li>${esc(t)}</li>`).join('');
+  $('#issues').hidden = !issues.length;
+  return issues;
+}
+
+function refresh() {
+  const n = $$('#rows tr').length;
+  $('#empty').hidden = n > 0;
+  $('#counter').textContent = n ? `Записей: ${n}` : '';
+  // фильтр по месту
+  const cur = $('#filter').value || 'all';
+  $('#filter').innerHTML = `<option value="all">Все места</option>` +
+    PLACES.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('') + `<option value="${OTHER}">Другие места</option>`;
+  $('#filter').value = cur;
+  applyFilter();
+  validate();
+}
+function applyFilter() {
+  const f = $('#filter').value;
+  $$('#rows tr').forEach(tr => {
+    const it = readRow(tr);
+    tr.classList.toggle('is-hidden', f !== 'all' && (f === OTHER ? !!it.room : it.room !== f));
+  });
+}
+function sortRows() {
+  const data = readAll();
+  data.items.sort((a, b) => (toMin(a.start) || 0) - (toMin(b.start) || 0) || placeName(a).localeCompare(placeName(b), 'ru'));
+  fill(data);
+}
+
+/* ---------- События таблицы ---------- */
+$('#rows').addEventListener('input', () => { setDirty(true); validate(); });
+$('#rows').addEventListener('change', e => {
+  if (e.target.dataset.f === 'room') {
+    const other = e.target.parentElement.querySelector('.other');
+    other.hidden = e.target.value !== OTHER;
+    if (!other.hidden) other.focus();
+  }
+  setDirty(true); validate();
+});
+$('#rows').addEventListener('click', e => {
+  const b = e.target.closest('.del');
+  if (!b) return;
+  const tr = b.closest('tr'), title = readRow(tr).title || 'без названия';
+  if (!confirm(`Удалить запись «${title}»?`)) return;
+  tr.remove(); setDirty(true); refresh();
+});
+$('#btnAdd').addEventListener('click', () => {
+  const last = $$('#rows tr').at(-1);
+  const prev = last ? readRow(last) : {};
+  const f = $('#filter').value;
+  // новая запись начинается там, где закончилась предыдущая, и в выбранном в фильтре зале
+  $('#rows').insertAdjacentHTML('beforeend', rowHTML({ start: prev.end || '', room: f !== 'all' && f !== OTHER ? f : '' }));
+  setDirty(true); refresh();
+  $$('#rows tr').at(-1).querySelector('[data-f="title"]').focus();
+});
+$('#evDate').addEventListener('input', () => setDirty(true));
+$('#filter').addEventListener('change', applyFilter);
+
+/* ---------- Сохранение и скачивание ---------- */
+$('#btnSave').addEventListener('click', async () => {
+  const issues = validate();
+  if (issues.length && !confirm(`Есть замечания (${issues.length}). Всё равно сохранить?`)) return;
+  sortRows();
+  const btn = $('#btnSave');
+  btn.disabled = true; setStatus('Сохранение…', 'warn');
+  try {
+    const res = await gh('PUT', {
+      message: 'Программа: обновление из админки',
+      content: b64encode(buildFile(readAll())),
+      sha, branch: REPO.branch,
+    });
+    sha = res.content.sha;
+    setDirty(false);
+    setStatus('Сохранено. На сайте появится через 1–2 минуты', 'ok');
+  } catch (e) {
+    setStatus(explain(e) + (e.status === 409 || e.status === 422 ? ' Скачайте свой файл, затем «Загрузить заново».' : ''), 'err');
+  } finally { btn.disabled = false; }
+});
+$('#btnDownload').addEventListener('click', () => {
+  sortRows();
+  const blob = new Blob([buildFile(readAll())], { type: 'text/javascript;charset=utf-8' });
+  const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'schedule.js' });
+  a.click(); URL.revokeObjectURL(a.href);
+});
+$('#btnReload').addEventListener('click', async () => {
+  if (dirty && !confirm('Несохранённые изменения пропадут. Загрузить заново?')) return;
+  try { await loadRemote(); } catch (e) { setStatus(explain(e), 'err'); }
+});
+$('#btnLogout').addEventListener('click', () => {
+  if (dirty && !confirm('Несохранённые изменения пропадут. Выйти?')) return;
+  try { localStorage.removeItem(TOKEN_KEY); } catch {}
+  dirty = false; location.reload();
+});
+
+/* ---------- Вход ---------- */
+function openEditor(m) {
+  mode = m;
+  $('#login').hidden = true;
+  $('#editor').hidden = false;
+  $('#actions').hidden = false;
+  $('#btnSave').hidden = m !== 'api';
+  $('#btnReload').hidden = m !== 'api';
+}
+async function login(t, remember) {
+  token = t;
+  try {
+    openEditor('api');
+    await loadRemote();
+    if (remember) try { localStorage.setItem(TOKEN_KEY, t); } catch {}
+  } catch (e) {
+    token = null;
+    $('#editor').hidden = true; $('#actions').hidden = true; $('#login').hidden = false;
+    $('#loginError').textContent = explain(e); $('#loginError').hidden = false;
+  }
+}
+$('#loginForm').addEventListener('submit', e => {
+  e.preventDefault();
+  $('#loginError').hidden = true;
+  login($('#token').value.trim(), $('#remember').checked);
+});
+$('#btnLocal').addEventListener('click', () => {
+  openEditor('local');
+  fill(window.FORUM_SCHEDULE || { date: '', items: [] });
+  setStatus('Режим без входа: изменения можно только скачать файлом', 'warn');
+});
+
+let saved = null;
+try { saved = localStorage.getItem(TOKEN_KEY); } catch {}
+if (saved) login(saved, true);
+</script>
+</body>
+</html>

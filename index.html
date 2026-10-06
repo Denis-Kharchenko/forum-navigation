@@ -4,9 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Навигация форума</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/fonts/fonts.css">
 <style>
 /* ===== Токены — как на forum-rm2026.ru ===== */
 :root {
@@ -174,6 +172,13 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 .detail__sub { margin: 0; font-weight: 700; font-size: 15px; color: var(--ink-2); }
 .detail__hint { display: flex; align-items: center; gap: 6px; margin: 8px 0 0; font-size: 13px; font-weight: 600; color: var(--red); }
 .detail__hint[hidden] { display: none; }
+.agenda { list-style: none; margin: 10px 0 0; padding: 8px 0 0; border-top: 1px solid var(--line); display: grid; gap: 6px; }
+.agenda[hidden] { display: none; }
+.agenda li { display: grid; grid-template-columns: 46px 1fr; gap: 8px; font-size: 13px; line-height: 1.3; }
+.agenda time { font-family: var(--f-display); font-weight: 600; color: var(--blue); font-size: 15px; font-variant-numeric: tabular-nums; }
+.agenda b { display: block; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.agenda small { color: var(--ink-2); }
+.agenda .is-now time::after { content: "сейчас"; display: block; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--white); background: var(--red); padding: 0 4px; width: max-content; }
 .detail__hint .ico { width: 16px; height: 16px; }
 
 /* выдвижной сайдбар */
@@ -217,16 +222,33 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 /* ===== Программа ===== */
 .program-grid { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr); gap: clamp(14px, 2vw, 28px); }
 .prog-main { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
-.timeline { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--blue); flex: 1; min-height: 0; display: grid; grid-template-rows: repeat(7, minmax(0, 1fr)); }
-.slot { display: grid; grid-template-columns: 110px 1fr; gap: 16px; align-items: center; padding: 0 12px; border-bottom: 1px solid var(--line); position: relative; min-height: 0; }
-.slot__time { font-family: var(--f-display); font-weight: 600; font-size: clamp(20px, 2.6vh, 28px); color: var(--blue); line-height: 1; font-variant-numeric: tabular-nums; }
-.slot__time small { display: block; font-size: .5em; opacity: .7; margin-top: 3px; }
-.slot__title { font-weight: 700; font-size: clamp(14px, 1.8vh, 18px); line-height: 1.25; margin: 0 0 2px; }
-.slot__place { display: flex; align-items: center; gap: 5px; color: var(--ink-2); font-size: 13px; margin: 0; }
-.slot__place .ico { width: 14px; height: 14px; color: var(--red); }
-.slot.is-now { background: var(--blue-soft); }
-.slot.is-now::before { content: "Сейчас"; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-family: var(--f-display); text-transform: uppercase; font-size: 12px; letter-spacing: .15em; color: var(--white); background: var(--red); padding: 2px 8px; }
-.slot.is-past { opacity: .5; }
+.timeline { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--blue); flex: 1; min-height: 0; overflow: hidden; display: grid; grid-auto-rows: var(--row-h); align-content: start; --row-h: clamp(58px, 7.4vh, 80px); }
+.slot { display: grid; grid-template-columns: 96px minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 0 12px; border-bottom: 1px solid var(--line); position: relative; min-height: 0; overflow: hidden; }
+.slot__time { font-family: var(--f-display); font-weight: 600; font-size: clamp(19px, 2.4vh, 26px); color: var(--blue); line-height: 1; font-variant-numeric: tabular-nums; }
+.slot__time small { display: block; font-size: .55em; opacity: .7; margin-top: 3px; }
+.slot__main { min-width: 0; }
+.slot__title { font-weight: 700; font-size: clamp(14px, 1.75vh, 18px); line-height: 1.25; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.slot__meta { display: flex; align-items: center; gap: 8px; color: var(--ink-2); font-size: 13px; margin: 2px 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kind { font-family: var(--f-display); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; font-size: 11px; color: var(--blue); background: var(--blue-soft); padding: 1px 7px; flex: none; }
+.slot__place { display: flex; align-items: center; gap: 8px; }
+.place { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: var(--ink-2); white-space: nowrap; }
+.place .ico { width: 15px; height: 15px; color: var(--red); }
+.btn-map {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px;
+  font-family: var(--f-display); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; font-size: 14px;
+  background: var(--blue); color: var(--white); clip-path: var(--chamfer); white-space: nowrap; transition: background .15s, transform .12s;
+}
+.btn-map:active { transform: scale(.97); background: var(--blue-deep); }
+.btn-map .ico { width: 16px; height: 16px; }
+.slot.is-now { background: var(--blue-soft); box-shadow: inset 4px 0 0 var(--red); }
+.slot.is-now .slot__time::after { content: "Сейчас"; display: block; margin-top: 4px; font-size: 10px; letter-spacing: .15em; color: var(--white); background: var(--red); padding: 1px 6px; width: max-content; }
+.slot.is-past { opacity: .45; }
+.pager { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.pager[hidden] { display: none; }
+.pager__btn { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 16px; border: 2px solid var(--blue); color: var(--blue); background: var(--white); font-family: var(--f-display); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; font-size: 14px; }
+.pager__btn:disabled { opacity: .35; cursor: default; }
+.pager__info { font-family: var(--f-display); font-weight: 600; color: var(--ink-2); letter-spacing: .05em; }
+.stub[hidden] { display: none; }
 .stub { padding: 10px 14px; border: 2px dashed var(--line); background: var(--white); display: flex; gap: 10px; align-items: center; color: var(--ink-2); font-size: 13px; }
 .stub .ico { color: var(--blue); }
 .stub b { color: var(--ink); }
@@ -303,8 +325,11 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
   .logo__text, .header__event { display: none; }
   .tab { font-size: 14px; }
   .program-grid { display: flex; flex-direction: column; flex: none; }
-  .timeline, .speakers { display: block; }
-  .slot { padding: 10px 8px; }
+  .timeline { display: block; overflow: visible; }
+  .speakers { display: block; }
+  .slot { grid-template-columns: 70px 1fr; }
+  .slot__place { grid-column: 2; }
+  .slot { padding: 10px 8px; min-height: 64px; }
   .speaker { margin-bottom: 8px; }
   .cards { flex: none; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: none; grid-auto-rows: 300px; }
   :root { --sb-w: 280px; }
@@ -423,6 +448,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
             <h3 class="detail__title" id="dTitle"></h3>
             <p class="detail__sub" id="dSub"></p>
             <p class="detail__hint" id="dHint" hidden><svg class="ico"><use href="#i-stairs"/></svg><span></span></p>
+            <ul class="agenda" id="dAgenda" hidden></ul>
           </div>
 
         </aside>
@@ -435,14 +461,20 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
         <div class="page__head">
           <div>
             <p class="eyebrow">02 · Программа</p>
-            <h2 class="h2">Программа 23 октября</h2>
+            <h2 class="h2" id="progTitle">Программа</h2>
             <p class="lead">Кейс-лекции, тренинги, мастер-классы и пленарные сессии по актуальным темам.</p>
           </div>
+          <div class="chips" id="progChips" role="group" aria-label="Фильтр по залу"></div>
         </div>
         <div class="program-grid">
           <div class="prog-main">
             <ol class="timeline" id="timeline"></ol>
-            <div class="stub"><svg class="ico"><use href="#i-info"/></svg><span><b>Подробное расписание по залам скоро появится.</b> Темы сессий и мастер-классов опубликуем ближе к форуму.</span></div>
+            <div class="stub" id="progEmpty" hidden><svg class="ico"><use href="#i-info"/></svg><span><b>Подробное расписание скоро появится.</b> Темы сессий и мастер-классов опубликуем ближе к форуму.</span></div>
+            <div class="pager" id="pager">
+              <button type="button" class="pager__btn" id="pgPrev" aria-label="Предыдущая страница"><svg class="ico"><use href="#i-chev"/></svg>Раньше</button>
+              <span class="pager__info" id="pgInfo"></span>
+              <button type="button" class="pager__btn" id="pgNext" aria-label="Следующая страница">Позже<svg class="ico" style="transform:rotate(180deg)"><use href="#i-chev"/></svg></button>
+            </div>
           </div>
           <div class="prog-side">
             <div class="side-card">
@@ -485,86 +517,18 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
   </nav>
 </div>
 
+<script src="data/rooms.js"></script>
+<script src="data/schedule.js"></script>
 <script>
 /* ==========================================================================
-   ДАННЫЕ — правьте здесь.
-   Планы этажей отрисованы схематично в собственных координатах (единицы SVG).
-   type: hall — зал форума, main — холл, staff — для спикеров/организаторов,
-         other — прочие помещения, service — служебные, stairs, lift, terrace, roof.
-   t1 — заголовок (строки массива = переносы), t2 — подзаголовок.
-   list: true — показывать в боковом списке и делать кликабельным.
+   НАСТРОЙКИ СТОЙКИ. Помещения — в data/rooms.js, программа — в data/schedule.js
+   (её заполняют организаторы через admin.html).
    ========================================================================== */
 const KIOSK = { floor: 1, x: 230, y: 470 };   // где стоит стойка («Вы здесь»)
 const IDLE_SECONDS = 120;                      // сброс к началу при бездействии
 
-const FLOORS = {
-  // 1 этаж: схема повёрнута горизонтально, чтобы лучше помещаться на экране
-  1: { w: 1640, h: 712, masses: [[20, 20, 1600, 390], [20, 410, 420, 175], [20, 585, 305, 107]] },
-  // 2 этаж: координаты заданы как на исходной схеме, rotate: -90 поворачивает план против часовой стрелки
-  2: { w: 1275, h: 1115, rotate: -90, masses: [[20, 20, 300, 565], [20, 585, 300, 520], [320, 830, 155, 275], [320, 72, 480, 568], [800, 175, 325, 465]] },
-};
-
-const ROOMS = [
-  // ---------- 1 этаж ----------
-  { id: 'r1', floor: 1, type: 'hall', list: true, badge: '1', rect: [440, 255, 375, 147], t1: ['Зал 1'], t2: ['Созидая Среду'] },
-  { id: 'r2', floor: 1, type: 'hall', list: true, badge: '2', rect: [440, 28, 375, 157], t1: ['Зал 2'], t2: ['Созидая Будущее'] },
-  { id: 'r3', floor: 1, type: 'hall', list: true, badge: '3', rect: [28, 28, 412, 157], t1: ['Зал 3'], t2: ['Созидая Команду'] },
-  { id: 'r4', floor: 1, type: 'hall', list: true, badge: '4', rect: [1280, 170, 332, 232], t1: ['Зал 4'], t2: ['Созидая Культуру'] },
-  { id: 'r5', floor: 1, type: 'hall', list: true, badge: '5', rect: [930, 240, 350, 162], t1: ['Зал 5'], t2: ['Созидая Мастерство'] },
-  { id: 'r6', floor: 1, type: 'hall', list: true, badge: '6', rect: [1070, 28, 542, 142], t1: ['Зал 6'], t2: ['Созидая Общество'] },
-  { id: 'hall1', floor: 1, type: 'main', list: true, icon: 'i-door', rect: [28, 185, 412, 392], t1: ['Холл'] },
-  { id: 'st1a', floor: 1, type: 'stairs', rect: [28, 585, 297, 99], t3: ['Лестница'] },
-  { id: 'st1b', floor: 1, type: 'stairs', rect: [815, 185, 115, 217], t3: ['Лестница'] },
-  { id: 'sv1a', floor: 1, type: 'service', rect: [815, 28, 115, 157] },
-  { id: 'sv1b', floor: 1, type: 'service', rect: [930, 28, 140, 142] },
-
-  // ---------- 2 этаж ----------
-  { id: 'r7', floor: 2, type: 'main', list: true, badge: '7', poly: [[330, 80], [795, 80], [795, 180], [900, 180], [900, 632], [330, 632]], label: [615, 380], t1: ['Главный холл'] },
-  { id: 'r8', floor: 2, type: 'staff', list: true, badge: '8', rect: [30, 592, 118, 103], t1: ['Гримёрка'], t2: ['спикеров'] },
-  { id: 'r9', floor: 2, type: 'staff', list: true, badge: '9', rect: [192, 645, 118, 190], t1: ['ВИП-зал'] },
-  { id: 'r10', floor: 2, type: 'hall', list: true, badge: '10', rect: [30, 30, 280, 390], t1: ['Помещение 10'], t2: ['Зал'] },
-  { id: 'r11', floor: 2, type: 'staff', list: true, badge: '11', rect: [30, 430, 118, 75], t1: ['Комната', 'организаторов'] },
-  { id: 'bar', floor: 2, type: 'other', list: true, icon: 'i-cup', rect: [908, 410, 210, 222], t1: ['Лаунж-бар'] },
-  { id: 'cab', floor: 2, type: 'other', list: true, icon: 'i-users', rect: [30, 845, 118, 85], t1: ['Кабинет'] },
-  { id: 'std', floor: 2, type: 'other', list: true, icon: 'i-cam', rect: [30, 938, 118, 160], t1: ['Студия'] },
-  { id: 'pod', floor: 2, type: 'other', list: true, icon: 'i-mic', rect: [192, 845, 84, 85], t1: ['Подкаст-', 'ная'] },
-  { id: 'chr', floor: 2, type: 'other', list: true, icon: 'i-cam', rect: [280, 845, 132, 85], t1: ['Хромакей'], t2: ['Студия'] },
-  { id: 'sp2', floor: 2, type: 'stairs', rect: [336, 520, 56, 56], t3: ['Лестн.'] },
-  { id: 'st2a', floor: 2, type: 'stairs', rect: [192, 515, 118, 70], t3: ['Лестница'] },
-  { id: 'st2b', floor: 2, type: 'stairs', rect: [908, 180, 55, 105], t3: ['Лестница'] },
-  { id: 'st2c', floor: 2, type: 'stairs', rect: [420, 938, 48, 160], t3: ['Лестница'] },
-  { id: 'lift', floor: 2, type: 'lift', rect: [966, 325, 42, 78], t3: ['Лифт'] },
-  { id: 'sv2a', floor: 2, type: 'service', rect: [968, 180, 150, 110] },
-  { id: 'sv2b', floor: 2, type: 'service', rect: [192, 430, 118, 75] },
-  { id: 'sv2c', floor: 2, type: 'service', rect: [30, 515, 118, 70] },
-  { id: 'sv2d', floor: 2, type: 'service', rect: [192, 592, 118, 45] },
-  { id: 'sv2e', floor: 2, type: 'service', rect: [30, 702, 88, 55] },
-  { id: 'sv2f', floor: 2, type: 'service', rect: [30, 762, 88, 75] },
-  { id: 'sv2g', floor: 2, type: 'service', rect: [192, 938, 110, 160] },
-  { id: 'sv2h', floor: 2, type: 'service', rect: [306, 938, 108, 160] },
-  { id: 'tr1', floor: 2, type: 'terrace', rect: [322, 585, 100, 245], t3: ['Терраса', '1 эт.'] },
-  { id: 'tr2', floor: 2, type: 'terrace', rect: [1128, 65, 127, 577], t3: ['Терраса'] },
-  { id: 'tr3', floor: 2, type: 'terrace', rect: [425, 642, 475, 128], t3: ['Терраса'] },
-  { id: 'tr4', floor: 2, type: 'terrace', rect: [900, 642, 228, 128], t3: ['Терраса'] },
-  { id: 'dome', floor: 2, type: 'terrace', rect: [1128, 642, 127, 128], circle: true, t3: ['Купол'] },
-  { id: 'tr5', floor: 2, type: 'terrace', rect: [620, 770, 590, 172], t3: ['Открытая терраса'] },
-  { id: 'tr6', floor: 2, type: 'terrace', rect: [890, 945, 150, 130], t3: ['Терраса', 'во дворе'] },
-  { id: 'rf1', floor: 2, type: 'roof', rect: [425, 770, 195, 147], t3: ['Крыша'] },
-  { id: 'rf2', floor: 2, type: 'roof', rect: [1210, 770, 45, 172], t3: ['Крыша'] },
-  { id: 'rf3', floor: 2, type: 'roof', rect: [645, 945, 245, 130], t3: ['Крыша'] },
-  { id: 'rf4', floor: 2, type: 'roof', rect: [1040, 945, 215, 130], t3: ['Крыша'] },
-];
-
-const PROGRAM = [
-  { from: '09:00', to: '10:00', title: 'Сбор и регистрация участников', place: 'Welcome-зона «АТС»' },
-  { from: '10:00', to: '10:30', title: 'Открытие форума', place: 'Главная сцена' },
-  { from: '10:30', to: '13:00', title: 'Пленарные сессии · Тренинги · Мастер-классы', place: 'Залы кластера «АТС»' },
-  { from: '13:00', to: '14:00', title: 'Обед', place: 'Лобби «АТС»' },
-  { from: '14:00', to: '17:00', title: 'Тематические сессии · Воркшопы · Мастер-классы', place: 'Залы кластера «АТС»' },
-  { from: '17:00', to: '17:30', title: 'Нетворкинг', place: 'Главная сцена' },
-  { from: '17:30', to: '17:45', title: 'Завершение форума', place: 'Главная сцена', single: true },
-];
-const EVENT_DATE = '2026-10-23';
+const SCHEDULE = window.FORUM_SCHEDULE || { date: '2026-10-23', items: [] };
+const EVENT_DATE = SCHEDULE.date;
 
 const SPEAKERS = [
   ['Павел Крупин', 'CEO «VЛAVAШЕ»'],
@@ -635,7 +599,7 @@ function showView(name) {
   $$('.view').forEach(v => v.classList.toggle('is-active', v.id === VIEWS[name]));
   if (history.replaceState) history.replaceState(null, '', '#' + name);
   if (name === 'nav') requestAnimationFrame(() => plan.fit(false));
-  if (name === 'program') markNow();
+  if (name === 'program') { prog.page = -1; requestAnimationFrame(renderProgram); }
 }
 $$('.tab').forEach(t => t.addEventListener('click', () => showView(t.dataset.view)));
 
@@ -857,6 +821,9 @@ function selectRoom(id, focusPlan = true) {
   const hint = $('#dHint');
   hint.hidden = r.floor === KIOSK.floor;
   hint.querySelector('span').textContent = `Поднимитесь по лестнице на ${r.floor} этаж`;
+  const agenda = roomAgenda(id), ag = $('#dAgenda');
+  ag.hidden = !agenda.length;
+  ag.innerHTML = agenda.map(({ it, now }) => `<li${now ? ' class="is-now"' : ''}><time>${esc(it.start)}</time><span><b>${esc(it.title)}</b>${it.speaker ? `<small>${esc(it.speaker)}</small>` : ''}</span></li>`).join('');
   $('#detail').hidden = false;
   if (!$('#plan').classList.contains('sb-open')) { setSidebar(true, false); focusPlan = true; }
   if (focusPlan) plan.focus(bboxOf(r));
@@ -865,27 +832,92 @@ function clearSelection() { selected = null; markSelection(); $('#detail').hidde
 $('#detailClose').addEventListener('click', () => { clearSelection(); plan.fit(true); });
 $$('.floor-btn').forEach(b => b.addEventListener('click', () => renderFloor(+b.dataset.floor)));
 
-/* --- Программа --- */
-const toMin = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
-$('#timeline').innerHTML = PROGRAM.map((p, i) => `
-  <li class="slot" data-i="${i}">
-    <div class="slot__time">${p.from}${p.single ? '' : `<small>до ${p.to}</small>`}</div>
-    <div>
-      <p class="slot__title">${p.title}</p>
-      <p class="slot__place"><svg class="ico"><use href="#i-pin"/></svg>${p.place}</p>
-    </div>
-  </li>`).join('');
-function markNow() {
+/* --- Программа (данные из data/schedule.js) --- */
+const toMin = t => { const [h, m] = String(t).split(':').map(Number); return h * 60 + m; };
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const roomName = id => { const r = ROOMS.find(r => r.id === id); return r ? [...(r.t1 || [])].join(' ').replace('- ', '') : ''; };
+const placeOf = it => it.room ? roomName(it.room) : (it.place || '');
+const ITEMS = (SCHEDULE.items || []).filter(it => it.start && it.title)
+  .sort((a, b) => toMin(a.start) - toMin(b.start) || placeOf(a).localeCompare(placeOf(b), 'ru'));
+
+function nowState() {
   const d = new Date();
-  const isToday = d.toLocaleDateString('sv-SE') === EVENT_DATE;   // YYYY-MM-DD в локальном времени
-  const now = d.getHours() * 60 + d.getMinutes();
-  $$('.slot').forEach(el => {
-    const p = PROGRAM[el.dataset.i];
-    el.classList.toggle('is-now', isToday && now >= toMin(p.from) && now < toMin(p.to));
-    el.classList.toggle('is-past', isToday && now >= toMin(p.to));
-  });
+  return { today: d.toLocaleDateString('sv-SE') === EVENT_DATE, now: d.getHours() * 60 + d.getMinutes() };   // дата YYYY-MM-DD в локальном времени
 }
+const isNow = (it, st) => st.today && st.now >= toMin(it.start) && st.now < toMin(it.end || it.start);
+const isPast = (it, st) => st.today && st.now >= toMin(it.end || it.start);
+
+// Заголовок с датой из файла программы
+if (EVENT_DATE) $('#progTitle').textContent = 'Программа ' + new Date(EVENT_DATE + 'T12:00').toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+
+const prog = { room: 'all', page: 0, perPage: 6 };
+// Фильтр по залам: только те, что встречаются в программе
+const progRooms = [...new Set(ITEMS.map(it => it.room).filter(Boolean))]
+  .sort((a, b) => ROOMS.findIndex(r => r.id === a) - ROOMS.findIndex(r => r.id === b));
+$('#progChips').innerHTML = [['all', 'Все'], ...progRooms.map(id => [id, roomName(id)])]
+  .map(([id, n], i) => `<button type="button" class="chip" aria-pressed="${i === 0}" data-room="${id}">${esc(n)}</button>`).join('');
+$$('#progChips .chip').forEach(ch => ch.addEventListener('click', () => {
+  $$('#progChips .chip').forEach(x => x.setAttribute('aria-pressed', String(x === ch)));
+  prog.room = ch.dataset.room; prog.page = -1; renderProgram();
+}));
+
+function slotHTML(it, st) {
+  const place = placeOf(it);
+  return `<li class="slot${isNow(it, st) ? ' is-now' : ''}${isPast(it, st) ? ' is-past' : ''}">
+    <div class="slot__time">${esc(it.start)}${it.end ? `<small>до ${esc(it.end)}</small>` : ''}</div>
+    <div class="slot__main">
+      <p class="slot__title">${esc(it.title)}</p>
+      <p class="slot__meta">${it.kind ? `<span class="kind">${esc(it.kind)}</span>` : ''}${esc(it.speaker)}</p>
+    </div>
+    <div class="slot__place">
+      ${place ? `<span class="place"><svg class="ico"><use href="#i-pin"/></svg>${esc(place)}</span>` : ''}
+      ${it.room ? `<button type="button" class="btn-map" data-room="${esc(it.room)}">На плане<svg class="ico"><use href="#i-arrow"/></svg></button>` : ''}
+    </div>
+  </li>`;
+}
+
+function renderProgram() {
+  const list = $('#timeline'), st = nowState();
+  const items = prog.room === 'all' ? ITEMS : ITEMS.filter(it => it.room === prog.room);
+  $('#progEmpty').hidden = items.length > 0;
+  // Сколько строк помещается без прокрутки — меряем по одной отрисованной строке
+  const scrollMode = matchMedia('(max-width: 700px), (max-height: 560px)').matches;
+  if (items.length && !scrollMode) {
+    list.innerHTML = slotHTML(items[0], st);
+    const rowH = list.firstElementChild.offsetHeight || 64;
+    prog.perPage = Math.max(1, Math.floor((list.clientHeight - 2) / rowH));
+  } else prog.perPage = Math.max(1, items.length);
+  const pages = Math.max(1, Math.ceil(items.length / prog.perPage));
+  if (prog.page < 0) {   // по умолчанию — страница с текущей или ближайшей лекцией
+    const i = st.today ? items.findIndex(it => !isPast(it, st)) : 0;
+    prog.page = Math.floor(Math.max(0, i) / prog.perPage);
+  }
+  prog.page = Math.min(prog.page, pages - 1);
+  list.innerHTML = items.slice(prog.page * prog.perPage, (prog.page + 1) * prog.perPage).map(it => slotHTML(it, st)).join('');
+  $('#pager').hidden = pages < 2;
+  $('#pgInfo').textContent = `${prog.page + 1} / ${pages}`;
+  $('#pgPrev').disabled = prog.page === 0;
+  $('#pgNext').disabled = prog.page >= pages - 1;
+}
+$('#pgPrev').addEventListener('click', () => { prog.page--; renderProgram(); });
+$('#pgNext').addEventListener('click', () => { prog.page++; renderProgram(); });
+$('#timeline').addEventListener('click', e => {
+  const b = e.target.closest('.btn-map');
+  if (!b) return;
+  showView('nav');
+  requestAnimationFrame(() => selectRoom(b.dataset.room, true));
+});
+function markNow() { if ($('#view-program').classList.contains('is-active')) renderProgram(); }
 setInterval(markNow, 60000);
+window.addEventListener('resize', markNow);
+
+// Программа выбранного зала для карточки в навигации: текущая и ближайшие
+function roomAgenda(id) {
+  const st = nowState();
+  return ITEMS.filter(it => it.room === id && !isPast(it, st)).slice(0, 3)
+    .map(it => ({ it, now: isNow(it, st) }));
+}
+
 $('#speakers').innerHTML = SPEAKERS.map(([n, role]) => {
   const ini = n.split(' ').map(w => w[0]).join('');
   return `<li class="speaker"><span class="avatar" aria-hidden="true">${ini}</span><span><b>${n}</b><small>${role}</small></span></li>`;

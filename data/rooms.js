@@ -1,0 +1,65 @@
+/* ==========================================================================
+   Помещения и схемы этажей. Общий файл для стойки (index.html) и админки (admin.html).
+   Планы отрисованы схематично в собственных координатах (единицы SVG).
+   type: hall — зал форума, main — холл, staff — для спикеров/организаторов,
+         other — прочие помещения, service — служебные, stairs, lift, terrace, roof.
+   t1 — заголовок (строки массива = переносы), t2 — подзаголовок.
+   list: true — показывать в списке помещений, на плане и в выборе места в админке.
+   ========================================================================== */
+const FLOORS = {
+  // 1 этаж: схема повёрнута горизонтально, чтобы лучше помещаться на экране
+  1: { w: 1640, h: 712, masses: [[20, 20, 1600, 390], [20, 410, 420, 175], [20, 585, 305, 107]] },
+  // 2 этаж: координаты заданы как на исходной схеме, rotate: -90 поворачивает план против часовой стрелки
+  2: { w: 1275, h: 1115, rotate: -90, masses: [[20, 20, 300, 565], [20, 585, 300, 520], [320, 830, 155, 275], [320, 72, 480, 568], [800, 175, 325, 465]] },
+};
+
+const ROOMS = [
+  // ---------- 1 этаж ----------
+  { id: 'r1', floor: 1, type: 'hall', list: true, badge: '1', rect: [440, 255, 375, 147], t1: ['Зал 1'], t2: ['Созидая Среду'] },
+  { id: 'r2', floor: 1, type: 'hall', list: true, badge: '2', rect: [440, 28, 375, 157], t1: ['Зал 2'], t2: ['Созидая Будущее'] },
+  { id: 'r3', floor: 1, type: 'hall', list: true, badge: '3', rect: [28, 28, 412, 157], t1: ['Зал 3'], t2: ['Созидая Команду'] },
+  { id: 'r4', floor: 1, type: 'hall', list: true, badge: '4', rect: [1280, 170, 332, 232], t1: ['Зал 4'], t2: ['Созидая Культуру'] },
+  { id: 'r5', floor: 1, type: 'hall', list: true, badge: '5', rect: [930, 240, 350, 162], t1: ['Зал 5'], t2: ['Созидая Мастерство'] },
+  { id: 'r6', floor: 1, type: 'hall', list: true, badge: '6', rect: [1070, 28, 542, 142], t1: ['Зал 6'], t2: ['Созидая Общество'] },
+  { id: 'hall1', floor: 1, type: 'main', list: true, icon: 'i-door', rect: [28, 185, 412, 392], t1: ['Холл'] },
+  { id: 'st1a', floor: 1, type: 'stairs', rect: [28, 585, 297, 99], t3: ['Лестница'] },
+  { id: 'st1b', floor: 1, type: 'stairs', rect: [815, 185, 115, 217], t3: ['Лестница'] },
+  { id: 'sv1a', floor: 1, type: 'service', rect: [815, 28, 115, 157] },
+  { id: 'sv1b', floor: 1, type: 'service', rect: [930, 28, 140, 142] },
+
+  // ---------- 2 этаж ----------
+  { id: 'r7', floor: 2, type: 'main', list: true, badge: '7', poly: [[330, 80], [795, 80], [795, 180], [900, 180], [900, 632], [330, 632]], label: [615, 380], t1: ['Главный холл'] },
+  { id: 'r8', floor: 2, type: 'staff', list: true, badge: '8', rect: [30, 592, 118, 103], t1: ['Гримёрка'], t2: ['спикеров'] },
+  { id: 'r9', floor: 2, type: 'staff', list: true, badge: '9', rect: [192, 645, 118, 190], t1: ['ВИП-зал'] },
+  { id: 'r10', floor: 2, type: 'hall', list: true, badge: '10', rect: [30, 30, 280, 390], t1: ['Помещение 10'], t2: ['Зал'] },
+  { id: 'r11', floor: 2, type: 'staff', list: true, badge: '11', rect: [30, 430, 118, 75], t1: ['Комната', 'организаторов'] },
+  { id: 'bar', floor: 2, type: 'other', list: true, icon: 'i-cup', rect: [908, 410, 210, 222], t1: ['Лаунж-бар'] },
+  { id: 'cab', floor: 2, type: 'other', list: true, icon: 'i-users', rect: [30, 845, 118, 85], t1: ['Кабинет'] },
+  { id: 'std', floor: 2, type: 'other', list: true, icon: 'i-cam', rect: [30, 938, 118, 160], t1: ['Студия'] },
+  { id: 'pod', floor: 2, type: 'other', list: true, icon: 'i-mic', rect: [192, 845, 84, 85], t1: ['Подкаст-', 'ная'] },
+  { id: 'chr', floor: 2, type: 'other', list: true, icon: 'i-cam', rect: [280, 845, 132, 85], t1: ['Хромакей'], t2: ['Студия'] },
+  { id: 'sp2', floor: 2, type: 'stairs', rect: [336, 520, 56, 56], t3: ['Лестн.'] },
+  { id: 'st2a', floor: 2, type: 'stairs', rect: [192, 515, 118, 70], t3: ['Лестница'] },
+  { id: 'st2b', floor: 2, type: 'stairs', rect: [908, 180, 55, 105], t3: ['Лестница'] },
+  { id: 'st2c', floor: 2, type: 'stairs', rect: [420, 938, 48, 160], t3: ['Лестница'] },
+  { id: 'lift', floor: 2, type: 'lift', rect: [966, 325, 42, 78], t3: ['Лифт'] },
+  { id: 'sv2a', floor: 2, type: 'service', rect: [968, 180, 150, 110] },
+  { id: 'sv2b', floor: 2, type: 'service', rect: [192, 430, 118, 75] },
+  { id: 'sv2c', floor: 2, type: 'service', rect: [30, 515, 118, 70] },
+  { id: 'sv2d', floor: 2, type: 'service', rect: [192, 592, 118, 45] },
+  { id: 'sv2e', floor: 2, type: 'service', rect: [30, 702, 88, 55] },
+  { id: 'sv2f', floor: 2, type: 'service', rect: [30, 762, 88, 75] },
+  { id: 'sv2g', floor: 2, type: 'service', rect: [192, 938, 110, 160] },
+  { id: 'sv2h', floor: 2, type: 'service', rect: [306, 938, 108, 160] },
+  { id: 'tr1', floor: 2, type: 'terrace', rect: [322, 585, 100, 245], t3: ['Терраса', '1 эт.'] },
+  { id: 'tr2', floor: 2, type: 'terrace', rect: [1128, 65, 127, 577], t3: ['Терраса'] },
+  { id: 'tr3', floor: 2, type: 'terrace', rect: [425, 642, 475, 128], t3: ['Терраса'] },
+  { id: 'tr4', floor: 2, type: 'terrace', rect: [900, 642, 228, 128], t3: ['Терраса'] },
+  { id: 'dome', floor: 2, type: 'terrace', rect: [1128, 642, 127, 128], circle: true, t3: ['Купол'] },
+  { id: 'tr5', floor: 2, type: 'terrace', rect: [620, 770, 590, 172], t3: ['Открытая терраса'] },
+  { id: 'tr6', floor: 2, type: 'terrace', rect: [890, 945, 150, 130], t3: ['Терраса', 'во дворе'] },
+  { id: 'rf1', floor: 2, type: 'roof', rect: [425, 770, 195, 147], t3: ['Крыша'] },
+  { id: 'rf2', floor: 2, type: 'roof', rect: [1210, 770, 45, 172], t3: ['Крыша'] },
+  { id: 'rf3', floor: 2, type: 'roof', rect: [645, 945, 245, 130], t3: ['Крыша'] },
+  { id: 'rf4', floor: 2, type: 'roof', rect: [1040, 945, 215, 130], t3: ['Крыша'] },
+];
