@@ -98,7 +98,7 @@ function splitTwo(text) {
 }
 
 // На телефоне план целиком мелкий — подписи крупнее (насколько позволяет размер комнаты)
-const labelScale = () => (matchMedia('(max-width: 600px)').matches ? 1.9 : 1);
+const labelScale = () => (matchMedia('(max-width: 600px)').matches ? 1.5 : 1);
 
 // Подпись: подбираем перенос и размер шрифта, чтобы текст влез в помещение
 function drawLabel(g, r) {

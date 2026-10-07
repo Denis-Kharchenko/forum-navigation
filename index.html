@@ -318,105 +318,102 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 /* Совсем маленькие экраны (не стойка) — разрешаем прокрутку как запасной вариант */
 @media (max-width: 700px), (max-height: 560px) {
   .page { overflow-y: auto; }
+  #view-program .page { overflow: hidden; }   /* расписание — без прокрутки, листается страницами */
   .logo__text, .header__event { display: none; }
   .tab { font-size: 14px; }
-  .program-grid { display: flex; flex-direction: column; flex: none; }
-  .timeline { display: block; overflow: visible; }
-  .slot { grid-template-columns: 70px 1fr; }
-  .slot__place { grid-column: 2; }
-  .slot { padding: 10px 8px; min-height: 64px; }
   .cards { flex: none; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: none; grid-auto-rows: 300px; }
   :root { --sb-w: 280px; }
 }
 
 /* ===== Телефон (вертикально) ===== */
 @media (max-width: 600px) {
-  :root { --gutter: 14px; --sb-h: 46%; }
-  body { font-size: 18px; }
-  .header { height: 64px; gap: 10px; }
-  .logo__mark { width: 44px; height: 42px; }
-  .clock { font-size: 30px; padding: 8px 14px 8px 12px; }
+  :root { --gutter: 12px; --sb-h: 42%; }
+  body { font-size: 16px; }
+  .header { height: 56px; gap: 10px; }
+  .logo__mark { width: 38px; height: 37px; }
+  .clock { font-size: 26px; padding: 7px 12px 7px 10px; }
 
   /* нижние вкладки: иконка над подписью */
-  .tabbar { gap: 6px; padding: 8px 10px calc(8px + env(safe-area-inset-bottom)); }
-  .tab { flex-direction: column; gap: 5px; min-height: 76px; padding: 0 2px; font-size: 16px; letter-spacing: .03em; }
-  .tab .ico { width: 30px; height: 30px; }
+  .tabbar { gap: 6px; padding: 6px 10px calc(6px + env(safe-area-inset-bottom)); }
+  .tab { flex-direction: column; gap: 4px; min-height: 64px; padding: 0 2px; font-size: 14px; letter-spacing: .03em; }
+  .tab .ico { width: 26px; height: 26px; }
 
   /* навигация */
   .plan__top { left: 8px; top: 8px; right: 8px; }
   .legend { display: none; }
   .floors { left: 8px; }
-  .floor-btn { width: 72px; height: 72px; }
-  .floor-btn b { font-size: 32px; }
-  .floor-btn span { font-size: 12px; }
-  .zoom { right: 8px; gap: 8px; }
-  .zoom button { width: 56px; height: 56px; }
-  .zoom .ico { width: 28px; height: 28px; }
-  .sb-toggle { width: 230px; height: 52px; top: -52px; font-size: 17px; gap: 10px; }
-  .sb-toggle .ico { width: 24px; height: 24px; }
-  .sidebar__head { padding: 14px 16px 8px; }
-  .sidebar__head .eyebrow { font-size: 14px; }
-  .sidebar__head .h2 { font-size: 32px; }
-  .rooms { grid-template-columns: 1fr; grid-auto-rows: auto; overflow-y: auto; padding: 0 14px 12px; }
-  .rooms li { min-height: 78px; }
-  .room-btn { grid-template-columns: 58px 1fr; gap: 16px; padding: 10px 8px 10px 4px; }
-  .room-num { width: 58px; height: 58px; font-size: 28px; }
-  .room-num .ico { width: 30px; height: 30px; }
-  .room-btn b { font-size: 22px; }
-  .room-btn small { font-size: 17px; }
-  .detail { margin: 0 14px 14px; padding: 16px 56px 18px 16px; }
-  .detail__kicker { font-size: 14px; }
-  .detail__title { font-size: 30px; }
-  .detail__sub { font-size: 19px; }
-  .detail__close { width: 52px; height: 52px; }
-  .detail__close .ico { width: 26px; height: 26px; }
-  .detail__hint { font-size: 17px; }
-  .detail__hint .ico { width: 22px; height: 22px; }
-  .btn-route { min-height: 60px; font-size: 20px; padding: 0 22px; margin-top: 14px; }
-  .btn-route .ico { width: 24px; height: 24px; }
+  .floor-btn { width: 60px; height: 60px; }
+  .floor-btn b { font-size: 26px; }
+  .zoom { right: 8px; gap: 6px; }
+  .zoom button { width: 48px; height: 48px; }
+  .zoom .ico { width: 24px; height: 24px; }
+  .sb-toggle { width: 200px; height: 44px; top: -44px; font-size: 15px; }
+  .sidebar__head { padding: 10px 14px 4px; }
+  .sidebar__head .eyebrow { font-size: 12px; }
+  .sidebar__head .h2 { font-size: 24px; }
+  .rooms { grid-template-columns: 1fr; grid-auto-rows: auto; overflow-y: auto; padding: 0 12px 8px; }
+  .rooms li { min-height: 52px; }
+  .room-btn { grid-template-columns: 38px 1fr; gap: 12px; padding: 6px 8px 6px 2px; }
+  .room-num { width: 38px; height: 38px; font-size: 18px; }
+  .room-num .ico { width: 20px; height: 20px; }
+  .room-btn b { font-size: 16px; }
+  .room-btn small { font-size: 13px; }
+  .detail { margin: 0 12px 12px; padding: 12px 52px 14px 14px; }
+  .detail__kicker { font-size: 12px; }
+  .detail__title { font-size: 24px; }
+  .detail__sub { font-size: 16px; }
+  .detail__close { width: 48px; height: 48px; }
+  .detail__hint { font-size: 14px; }
+  .btn-route { min-height: 52px; font-size: 17px; padding: 0 18px; margin-top: 12px; }
+  .btn-route .ico { width: 20px; height: 20px; }
   .agenda { display: none; }
-  .route__reveal { stroke-width: 80; }
-  .route__halo { stroke-width: 28; }
-  .route__line { stroke-width: 15; stroke-dasharray: 30 22; }
-  .step { top: 12px; font-size: 19px; padding: 14px 18px; white-space: normal; width: max-content; max-width: calc(100% - 24px); text-align: left; }
-  .step .ico { width: 30px; height: 30px; }
+  .route__reveal { stroke-width: 64; }
+  .route__halo { stroke-width: 22; }
+  .route__line { stroke-width: 12; stroke-dasharray: 24 18; }
+  .step { top: 12px; font-size: 16px; padding: 12px 16px; white-space: normal; width: max-content; max-width: calc(100% - 24px); text-align: left; }
+  .step .ico { width: 26px; height: 26px; }
 
-  /* программа и профессии: прокрутка страницы, фильтры — горизонтальной лентой */
-  .page { padding: 18px var(--gutter) 28px; gap: 16px; }
-  .eyebrow { font-size: 15px; }
-  .h2 { font-size: 36px; }
-  .lead { font-size: 17px; }
-  .chips { flex-wrap: nowrap; overflow-x: auto; margin: 0 calc(-1 * var(--gutter)); padding: 2px var(--gutter); scrollbar-width: none; width: calc(100% + 2 * var(--gutter)); gap: 8px; }
+  /* заголовки разделов */
+  .page { padding: 14px var(--gutter) 16px; gap: 12px; }
+  .eyebrow { font-size: 13px; }
+  .h2 { font-size: 28px; }
+  .lead { font-size: 14px; }
+  .chips { flex-wrap: nowrap; overflow-x: auto; margin: 0 calc(-1 * var(--gutter)); padding: 2px var(--gutter); scrollbar-width: none; width: calc(100% + 2 * var(--gutter)); gap: 6px; }
   .chips::-webkit-scrollbar { display: none; }
-  .chips .chip, .chips .chip--track { flex: none; min-height: 58px; font-size: 18px; padding: 0 22px; }
-  .slot { grid-template-columns: 78px minmax(0, 1fr); gap: 14px; padding: 18px 10px 18px 20px; }
-  .slot__time { font-size: 28px; }
-  .slot__title { white-space: normal; font-size: 21px; line-height: 1.25; }
-  .slot__meta { white-space: normal; flex-wrap: wrap; font-size: 17px; margin-top: 6px; }
-  .slot .kind { font-size: 14px; padding: 2px 8px; }
-  .slot__place { grid-column: 2; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
-  .place { font-size: 18px; }
-  .place .ico { width: 20px; height: 20px; }
-  .btn-map { min-height: 56px; font-size: 18px; padding: 0 20px; }
-  .btn-map .ico { width: 20px; height: 20px; }
-  .pager__btn { min-height: 56px; font-size: 18px; }
-  .stub { font-size: 17px; }
+  .chips .chip, .chips .chip--track { flex: none; min-height: 48px; font-size: 16px; padding: 0 18px; }
 
-  /* профессии — одна колонка, крупный текст */
-  .cards { grid-template-columns: 1fr; grid-auto-rows: 300px; gap: 12px; }
-  .card__face { padding: 20px; }
-  .card__front::after { right: 30px; width: 14px; height: 80px; }
-  .card__num { font-size: 16px; }
-  .card__icon { width: 72px; height: 72px; margin: 12px 0 16px; }
-  .card__name { font-size: 30px; overflow-wrap: anywhere; }
-  .card__sphere { font-size: 15px; }
-  .card__hint { font-size: 17px; }
-  .card__hint .ico { width: 22px; height: 22px; }
-  .card__back .card__name { font-size: 24px; margin-bottom: 10px; }
-  .card__desc { font-size: 18px; line-height: 1.4; }
-  .card__skills span { font-size: 15px; padding: 4px 10px; }
-  .salary small { font-size: 13px; }
-  .salary b { font-size: 34px; }
+  /* программа: компактные строки фиксированной высоты, листание страницами */
+  #view-program .lead { display: none; }
+  .timeline { --row-h: 96px; }
+  .slot { grid-template-columns: 54px minmax(0, 1fr) auto; gap: 10px; padding: 0 8px 0 16px; align-items: center; }
+  .slot__time { font-size: 19px; }
+  .slot__time small { font-size: .62em; }
+  .slot__title { white-space: normal; font-size: 16px; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .slot__meta { font-size: 13px; margin-top: 3px; }
+  .slot .kind { font-size: 11px; }
+  .slot__place { flex-direction: column; align-items: flex-end; gap: 4px; }
+  .place { font-size: 13px; max-width: 110px; overflow: hidden; text-overflow: ellipsis; }
+  .place .ico { width: 15px; height: 15px; }
+  .btn-map { min-height: 44px; font-size: 14px; padding: 0 12px; gap: 6px; }
+  .btn-map .ico { width: 16px; height: 16px; }
+  .pager__btn { min-height: 48px; font-size: 15px; }
+  .pager__info { font-size: 16px; }
+
+  /* профессии: две колонки */
+  .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 270px; gap: 10px; }
+  .card__face { padding: 12px; }
+  .card__front::after { right: 22px; width: 10px; height: 56px; }
+  .card__num { font-size: 13px; }
+  .card__icon { width: 48px; height: 48px; margin: 10px 0 12px; }
+  .card__name { font-size: clamp(15px, 4.4vw, 18px); overflow-wrap: anywhere; }
+  .card__sphere { font-size: 12px; }
+  .card__hint { font-size: 12px; }
+  .card__hint .ico { width: 18px; height: 18px; }
+  .card__back .card__name { font-size: 15px; margin-bottom: 6px; }
+  .card__desc { font-size: 13px; line-height: 1.35; }
+  .card__skills span { font-size: 12px; padding: 2px 7px; }
+  .salary small { font-size: 11px; }
+  .salary b { font-size: 22px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -615,10 +612,6 @@ const PROFESSIONS = [
   { name: 'Менеджер по благополучию сотрудников', sphere: 'Город и люди', icon: 'p-heart', salary: 130000, skills: ['HR', 'Психология'], desc: 'Заботится о здоровье, финансовой грамотности и развитии сотрудников — чтобы людям хотелось работать и расти.' },
 ];
 
-// На вертикальных экранах 1 этаж разворачиваем вертикально — как на исходном плане, без пустот
-const PORTRAIT = matchMedia('(orientation: portrait)');
-if (PORTRAIT.matches) FLOORS[1].rotate = 90;
-PORTRAIT.addEventListener('change', () => location.reload());
 // маршрут начинается от стойки; точка стойки поворачивается вместе с этажом
 PATHS[KIOSK.floor].nodes.K = [KIOSK.x, KIOSK.y];
 // названия и штриховка помещений из админки (data/schedule.js → rooms)
@@ -989,12 +982,11 @@ function renderProgram() {
   const items = ITEMS.filter(it => trackOf(it) === ALL || trackOf(it) === prog.track);
   $('#progEmpty').hidden = items.length > 0;
   // Сколько строк помещается без прокрутки — меряем по одной отрисованной строке
-  const scrollMode = matchMedia('(max-width: 700px), (max-height: 560px)').matches;
-  if (items.length && !scrollMode) {
+  if (items.length) {
     list.innerHTML = slotHTML(items[0], st);
     const rowH = list.firstElementChild.offsetHeight || 64;
     prog.perPage = Math.max(1, Math.floor((list.clientHeight - 2) / rowH));
-  } else prog.perPage = Math.max(1, items.length);
+  } else prog.perPage = 1;
   const pages = Math.max(1, Math.ceil(items.length / prog.perPage));
   if (prog.page < 0) {   // по умолчанию — страница с текущей или ближайшей лекцией
     const i = st.today ? items.findIndex(it => !isPast(it, st)) : 0;
