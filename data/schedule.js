@@ -1,7 +1,7 @@
 /* Программа форума. Файл записывает админка (admin.html) — вручную лучше не править. */
 window.FORUM_SCHEDULE = {
   "date": "2026-10-23",
-  "updated": "2026-10-07T00:00:00.000Z",
+  "updated": "2026-10-07T00:36:50.515Z",
   "tracks": [
     {"id":"t1","name":"Трек 1","color":"#2450EC"},
     {"id":"t2","name":"Трек 2","color":"#D00B12"},
@@ -10,6 +10,7 @@ window.FORUM_SCHEDULE = {
     {"id":"t5","name":"Трек 5","color":"#C45A00"}
   ],
   "rooms": {
+    "r2": {"hatched":true}
   },
   "items": [
     {"start":"09:00","end":"10:00","kind":"Общее","title":"Сбор и регистрация участников","speaker":"","room":"r1","place":"","track":"all"},
