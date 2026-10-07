@@ -81,10 +81,12 @@ details li { margin: 4px 0; }
 .panel { background: var(--white); padding: 16px 20px 18px; border-top: 4px solid var(--red); margin-bottom: 20px; }
 .panel h2 { font-family: var(--f-display); text-transform: uppercase; color: var(--blue); font-size: 20px; margin: 0 0 4px; }
 .panel p { margin: 0 0 12px; color: var(--ink-2); font-size: 13px; }
-.tracks-edit { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
-.track-edit { display: grid; grid-template-columns: 44px 1fr; gap: 8px; align-items: center; }
+.tracks-edit { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 10px; }
+.track-edit { display: grid; grid-template-columns: 44px 1fr 40px; gap: 8px; align-items: center; }
+.track-edit .del:disabled { opacity: .3; cursor: default; background: none; color: var(--ink-2); }
+.add-track { margin-top: 12px; }
 .track-edit input[type=color] { width: 44px; height: 42px; padding: 2px; border: 2px solid var(--line); background: var(--white); cursor: pointer; }
-.track-edit input[type=text] { min-height: 42px; padding: 0 10px; border: 2px solid var(--line); }
+.track-edit input[type=text] { width: 100%; min-width: 0; min-height: 42px; padding: 0 10px; border: 2px solid var(--line); }
 .track-edit input[type=text]:focus { border-color: var(--blue); outline: none; }
 .track-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
 .ttab { min-height: 40px; padding: 0 14px; border: 2px solid var(--c, var(--ink-2)); color: var(--c, var(--ink-2)); background: var(--white); font-family: var(--f-display); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; font-size: 14px; }
@@ -180,6 +182,7 @@ td.bad input, td.bad select { border-color: var(--red); background: var(--red-so
     <h2 id="tracksTitle">Треки</h2>
     <p>Названия и цвета треков — так они выглядят на стойке во вкладке «Программа».</p>
     <div class="tracks-edit" id="tracksEdit"></div>
+    <button type="button" class="btn add-track" id="btnAddTrack">+ Добавить трек</button>
   </section>
 
   <ul class="issues" id="issues" hidden></ul>
@@ -229,6 +232,9 @@ const DEFAULT_TRACKS = [
   { id: 't4', name: 'Трек 4', color: '#0E7C70' },
   { id: 't5', name: 'Трек 5', color: '#C45A00' },
 ];
+// Цвета для новых треков (по порядку, пропуская уже занятые)
+const PALETTE = ['#2450EC', '#D00B12', '#6E35D8', '#0E7C70', '#C45A00', '#B0247A', '#3B6E0A', '#0B5FA5'];
+const MAX_TRACKS = 8;   // больше не помещается в шапку программы на стойке
 let tracks = DEFAULT_TRACKS.map(t => ({ ...t }));
 let trackTab = ALL;   // какой трек показан в таблице
 const trackColor = id => tracks.find(t => t.id === id)?.color || '#9a9aa5';
@@ -352,8 +358,18 @@ function renderTracks() {
   $('#tracksEdit').innerHTML = tracks.map((t, i) => `<div class="track-edit">
       <input type="color" value="${esc(t.color)}" data-t="${i}" data-k="color" aria-label="Цвет: ${esc(t.name)}">
       <input type="text" value="${esc(t.name)}" data-t="${i}" data-k="name" aria-label="Название трека ${i + 1}" maxlength="40">
+      <button type="button" class="del" data-del-track="${i}" aria-label="Удалить трек ${esc(t.name)}"${tracks.length <= 1 ? ' disabled' : ''}><svg class="ico"><use href="#i-trash"/></svg></button>
     </div>`).join('');
+  $('#btnAddTrack').disabled = tracks.length >= MAX_TRACKS;
   renderTabs();
+}
+// После добавления или удаления трека — пересобрать выбор трека в строках, сохранив выбранное
+function refreshTrackCells() {
+  $$('#rows tr').forEach(tr => {
+    const it = readRow(tr);
+    tr.querySelector('[data-f="track"]').closest('td').innerHTML = trackCell(it);
+    tr.style.setProperty('--c', it.track === ALL ? '#9a9aa5' : trackColor(it.track));
+  });
 }
 function renderTabs() {
   const count = id => $$('#rows tr').filter(tr => readRow(tr).track === id).length;
@@ -480,6 +496,29 @@ $('#tracksEdit').addEventListener('input', e => {
   $$(`#rows [data-f="track"] option[value="${id}"]`).forEach(o => { o.textContent = tracks[i].name; });
   $$('#rows tr').forEach(tr => { if (readRow(tr).track === id) tr.style.setProperty('--c', tracks[i].color); });
   renderTabs(); setDirty(true); validate();
+});
+$('#btnAddTrack').addEventListener('click', () => {
+  if (tracks.length >= MAX_TRACKS) return;
+  let n = 1;
+  while (tracks.some(t => t.id === 't' + n)) n++;
+  const color = PALETTE.find(c => !tracks.some(t => t.color.toLowerCase() === c.toLowerCase())) || PALETTE[n % PALETTE.length];
+  tracks.push({ id: 't' + n, name: 'Трек ' + (tracks.length + 1), color });
+  renderTracks(); refreshTrackCells(); setDirty(true); validate();
+  $$('#tracksEdit input[type=text]').at(-1).select();
+});
+$('#tracksEdit').addEventListener('click', e => {
+  const b = e.target.closest('[data-del-track]');
+  if (!b || tracks.length <= 1) return;
+  const t = tracks[+b.dataset.delTrack];
+  const rows = $$('#rows tr').filter(tr => readRow(tr).track === t.id);
+  const msg = rows.length
+    ? `Удалить трек «${t.name}» вместе с его записями (${rows.length})? Записи «Применить ко всем трекам» останутся.`
+    : `Удалить трек «${t.name}»?`;
+  if (!confirm(msg)) return;
+  rows.forEach(tr => tr.remove());
+  tracks = tracks.filter(x => x !== t);
+  if (trackTab === t.id) trackTab = ALL;
+  renderTracks(); refreshTrackCells(); setDirty(true); refresh();
 });
 $('#trackTabs').addEventListener('click', e => {
   const b = e.target.closest('.ttab');
