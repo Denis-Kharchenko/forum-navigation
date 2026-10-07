@@ -206,7 +206,7 @@ td.bad input, td.bad select { border-color: var(--red); background: var(--red-so
   <section id="secRooms" hidden>
     <section class="panel">
       <h2>Помещения</h2>
-      <p>Нажмите на помещение на плане или в списке, чтобы переименовать его. «Заштриховать» убирает помещение из навигации стойки: на плане оно заштриховано, но подписано. Снимите галочку, чтобы вернуть.</p>
+      <p>Нажмите на помещение на плане или в списке, чтобы переименовать его. «Заштриховать» убирает помещение из навигации стойки: на плане оно заштриховано и без подписи. Чтобы подписать заштрихованное помещение, впишите ему название. Снимите галочку, чтобы вернуть.</p>
       <div class="rfloors" role="group" aria-label="Этаж">
         <button type="button" class="rfloor" data-floor="1" aria-pressed="true">1 этаж</button>
         <button type="button" class="rfloor" data-floor="2" aria-pressed="false">2 этаж</button>
@@ -620,11 +620,14 @@ function drawAdminPlan() {
 }
 function roomRowHTML(r) {
   const changed = Object.keys(roomDiff(r)).length > 0;
-  return `<div class="room-row${isHatched(r) ? ' is-hatched' : ''}" data-id="${r.id}">
+  // у заштрихованного помещения поле пустое: подпись на плане появится, только если вписать название
+  const hatched = isHatched(r), o = roomsOv[r.id] || {};
+  const name = hatched ? (o.name || '') : r.title, sub = hatched ? (o.sub || '') : r.sub;
+  return `<div class="room-row${hatched ? ' is-hatched' : ''}" data-id="${r.id}">
     <span class="room-badge room-badge--${r.type}" aria-hidden="true">${esc(r.badge || '')}</span>
     <div class="room-fields">
-      <input data-k="name" value="${esc(r.title)}" placeholder="${esc(r.base.title)}" aria-label="Название помещения" maxlength="60">
-      <input data-k="sub" value="${esc(r.sub)}" placeholder="Подзаголовок (необязательно)" aria-label="Подзаголовок" maxlength="60">
+      <input data-k="name" value="${esc(name)}" placeholder="${hatched ? 'Без подписи на плане' : esc(r.base.title)}" aria-label="Название помещения" maxlength="60">
+      <input data-k="sub" value="${esc(sub)}" placeholder="Подзаголовок (необязательно)" aria-label="Подзаголовок" maxlength="60">
     </div>
     <label class="hatch-check"><input type="checkbox" data-k="hatched"${isHatched(r) ? ' checked' : ''}> Заштриховать</label>
     <button type="button" class="reset" data-k="reset" title="Вернуть как было" aria-label="Вернуть как было"${changed ? '' : ' disabled'}><svg class="ico"><use href="#i-undo"/></svg></button>

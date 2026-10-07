@@ -71,11 +71,16 @@ function prepareRooms(overrides = {}) {
       sub: (r.t2 || []).join(' '),
     };
     Object.assign(r, { type: r.base.type, list: r.base.list, title: r.base.title, sub: r.base.sub });
-    const o = overrides[r.id];
-    if (!o || !isEditable(r)) return;
-    if (typeof o.name === 'string' && o.name.trim()) r.title = o.name.trim();
-    if (typeof o.sub === 'string') r.sub = o.sub.trim();
+    const o = isEditable(r) ? overrides[r.id] || {} : {};
+    const customName = typeof o.name === 'string' && o.name.trim() ? o.name.trim() : '';
+    const customSub = typeof o.sub === 'string' ? o.sub.trim() : '';
+    if (customName) r.title = customName;
+    if (typeof o.sub === 'string') r.sub = customSub;
     if (typeof o.hatched === 'boolean' && o.hatched !== (r.base.type === 'service')) setHatched(r, o.hatched);
+    // Подпись на плане. Заштрихованное помещение подписывается, только если ему задали своё название
+    const hatchedRoom = isEditable(r) && isHatched(r);
+    r.planTitle = hatchedRoom ? customName : r.title;
+    r.planSub = hatchedRoom ? (customName ? customSub : '') : r.sub;
   });
 }
 
@@ -98,11 +103,11 @@ function drawLabel(g, r) {
   const gray = !EDITABLE.includes(r.type) || r.type === 'service';
   const tStyle = gray ? { cls: 't3', size: 16, k: 0.6 } : { cls: 't1', size: 30, k: 0.52 };
   const sStyle = gray ? { cls: 't3', size: 14, k: 0.6 } : { cls: 't2', size: 20, k: 0.6 };
-  const title = r.title || '';
+  const title = r.planTitle ?? r.title ?? '', sub = r.planSub ?? r.sub ?? '';
   if (!title) return;
   const variants = [[title], splitTwo(title)].filter(Boolean).map(tl => [
     ...tl.map(t => ({ t, ...tStyle })),
-    ...(r.sub ? [{ t: r.sub, ...sStyle }] : []),
+    ...(sub ? [{ t: sub, ...sStyle }] : []),
   ]);
   // для каждого варианта — масштаб и поворот (вертикальная подпись, только если заметно крупнее)
   const measure = lines => {
