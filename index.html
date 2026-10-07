@@ -118,8 +118,17 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 /* верхняя панель плана: этажи + легенда */
 .plan__top { position: absolute; left: 12px; top: 12px; right: calc(12px + var(--sb-shift, 0px)); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; pointer-events: none; transition: right .35s var(--ease); }
 .plan__top > * { pointer-events: auto; }
-.floors { display: flex; background: var(--white); border: 2px solid var(--blue); }
-.floor-btn { min-height: 44px; padding: 0 18px; font-family: var(--f-display); font-weight: 600; font-size: 16px; text-transform: uppercase; letter-spacing: .04em; color: var(--blue); transition: background .2s, color .2s; }
+/* переключатель этажей — слева, как кнопки лифта: верхний этаж сверху */
+.floors {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%); z-index: 3;
+  display: flex; flex-direction: column; background: var(--white); border: 2px solid var(--blue);
+  box-shadow: 0 6px 20px rgba(17, 17, 20, .1); transition: top .35s var(--ease);
+}
+.floor-btn { width: 68px; height: 68px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--blue); transition: background .2s, color .2s; }
+.floor-btn + .floor-btn { border-top: 2px solid var(--blue); }
+.floor-btn b { font-family: var(--f-display); font-weight: 700; font-size: 30px; line-height: 1; }
+.floor-btn span { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; }
+.floor-btn:active { background: var(--blue-soft); }
 .floor-btn[aria-pressed="true"] { background: var(--blue); color: var(--white); }
 .legend { display: flex; gap: 6px; flex-wrap: wrap; pointer-events: none !important; }
 .legend span { display: flex; align-items: center; gap: 6px; background: var(--white); padding: 5px 9px; font-size: 12px; font-weight: 600; border: 1px solid var(--line); }
@@ -302,6 +311,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
   .plan.sb-open .sb-toggle .ico { transform: rotate(-90deg); }
   .zoom { transform: none; transition: bottom .35s var(--ease); }
   .plan.sb-open .zoom { bottom: calc(12px + var(--sb-h)); }
+  .plan.sb-open .floors { top: calc((100% - var(--sb-h)) / 2); }
   .rooms { display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: minmax(44px, 54px); column-gap: 14px; align-content: start; }
   .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(4, minmax(0, 1fr)); }
 }
@@ -321,54 +331,73 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 
 /* ===== Телефон (вертикально) ===== */
 @media (max-width: 600px) {
-  :root { --gutter: 12px; --sb-h: 48%; }
-  body { font-size: 15px; }
-  .header { height: 52px; gap: 10px; }
-  .logo__mark { width: 34px; height: 33px; }
-  .clock { font-size: 22px; padding: 6px 10px 6px 9px; }
+  :root { --gutter: 12px; --sb-h: 44%; }
+  body { font-size: 16px; }
+  .header { height: 56px; gap: 10px; }
+  .logo__mark { width: 38px; height: 37px; }
+  .clock { font-size: 24px; padding: 7px 12px 7px 10px; }
 
   /* нижние вкладки: иконка над подписью */
-  .tabbar { gap: 6px; padding: 6px var(--gutter) calc(6px + env(safe-area-inset-bottom)); }
-  .tab { flex-direction: column; gap: 3px; min-height: 56px; padding: 0 4px; font-size: 12px; letter-spacing: .04em; }
-  .tab .ico { width: 22px; height: 22px; }
+  .tabbar { gap: 6px; padding: 8px var(--gutter) calc(8px + env(safe-area-inset-bottom)); }
+  .tab { flex-direction: column; gap: 4px; min-height: 64px; padding: 0 4px; font-size: 13px; letter-spacing: .04em; }
+  .tab .ico { width: 26px; height: 26px; }
 
-  /* навигация: легенда скрыта, список помещений — выезжающая снизу шторка с прокруткой */
+  /* навигация */
   .plan__top { left: 8px; top: 8px; right: 8px; }
   .legend { display: none; }
-  .floor-btn { min-height: 44px; padding: 0 14px; font-size: 15px; }
-  .zoom { right: 8px; gap: 4px; }
-  .zoom button { width: 44px; height: 44px; }
-  .sb-toggle { width: 160px; height: 38px; top: -38px; font-size: 12px; }
-  .sidebar__head { padding: 10px 14px 6px; }
-  .sidebar__head .h2 { font-size: 22px; }
-  .rooms { grid-template-columns: 1fr; overflow-y: auto; padding: 0 12px 8px; }
-  .rooms li { min-height: 52px; }
-  .detail { margin: 0 12px 10px; padding: 10px 48px 10px 12px; }
-  .detail__title { font-size: 19px; }
+  .floors { left: 8px; }
+  .floor-btn { width: 60px; height: 60px; }
+  .floor-btn b { font-size: 26px; }
+  .zoom { right: 8px; gap: 6px; }
+  .zoom button { width: 48px; height: 48px; }
+  .sb-toggle { width: 200px; height: 44px; top: -44px; font-size: 14px; }
+  .sidebar__head { padding: 12px 16px 6px; }
+  .sidebar__head .eyebrow { font-size: 12px; }
+  .sidebar__head .h2 { font-size: 26px; }
+  .rooms { grid-template-columns: 1fr; grid-auto-rows: auto; overflow-y: auto; padding: 0 12px 10px; }
+  .rooms li { min-height: 66px; }
+  .room-btn { grid-template-columns: 48px 1fr; gap: 14px; padding: 8px 8px 8px 4px; }
+  .room-num { width: 48px; height: 48px; font-size: 22px; }
+  .room-num .ico { width: 24px; height: 24px; }
+  .room-btn b { font-size: 18px; }
+  .room-btn small { font-size: 14px; }
+  .detail { margin: 0 12px 12px; padding: 12px 52px 14px 14px; }
+  .detail__kicker { font-size: 12px; }
+  .detail__title { font-size: 24px; }
+  .detail__sub { font-size: 16px; }
+  .detail__close { width: 48px; height: 48px; }
+  .detail__hint { font-size: 14px; }
+  .btn-route { min-height: 50px; font-size: 16px; padding: 0 18px; }
   .agenda { display: none; }
-  .step { top: 60px; font-size: 14px; padding: 10px 14px; white-space: normal; width: max-content; max-width: calc(100% - 24px); text-align: left; }
+  .step { top: 12px; font-size: 16px; padding: 12px 16px; white-space: normal; width: max-content; max-width: calc(100% - 24px); text-align: left; }
 
   /* программа и профессии: прокрутка страницы, фильтры — горизонтальной лентой */
-  .page { padding: 14px var(--gutter) 20px; gap: 12px; }
-  .h2 { font-size: 26px; }
-  .lead { font-size: 13px; }
+  .page { padding: 16px var(--gutter) 24px; gap: 14px; }
+  .eyebrow { font-size: 13px; }
+  .h2 { font-size: 28px; }
+  .lead { font-size: 14px; }
   .chips { flex-wrap: nowrap; overflow-x: auto; margin: 0 calc(-1 * var(--gutter)); padding: 2px var(--gutter); scrollbar-width: none; width: calc(100% + 2 * var(--gutter)); }
   .chips::-webkit-scrollbar { display: none; }
-  .chips .chip, .chips .chip--track { flex: none; min-height: 44px; font-size: 13px; padding: 0 14px; }
-  .slot { grid-template-columns: 58px minmax(0, 1fr); gap: 10px; padding: 10px 8px 10px 16px; }
-  .slot__time { font-size: 18px; }
-  .slot__title { white-space: normal; font-size: 15px; }
-  .slot__meta { white-space: normal; flex-wrap: wrap; }
-  .slot__place { grid-column: 2; flex-wrap: wrap; }
-  .btn-map { min-height: 40px; font-size: 13px; padding: 0 12px; }
+  .chips .chip, .chips .chip--track { flex: none; min-height: 50px; font-size: 15px; padding: 0 18px; }
+  .slot { grid-template-columns: 64px minmax(0, 1fr); gap: 12px; padding: 14px 8px 14px 18px; }
+  .slot__time { font-size: 22px; }
+  .slot__title { white-space: normal; font-size: 17px; }
+  .slot__meta { white-space: normal; flex-wrap: wrap; font-size: 14px; }
+  .slot .kind { font-size: 12px; }
+  .slot__place { grid-column: 2; flex-wrap: wrap; margin-top: 4px; }
+  .place { font-size: 15px; }
+  .btn-map { min-height: 48px; font-size: 15px; padding: 0 16px; }
   .cards { grid-auto-rows: 290px; gap: 10px; }
-  .card__face { padding: 12px; }
-  .card__icon { width: 40px; height: 40px; margin: 8px 0; }
-  .card__name { font-size: 16px; }
-  .card__back .card__name { font-size: 14px; }
-  .card__desc { font-size: 12px; line-height: 1.35; }
-  .card__hint { font-size: 11px; }
-  .salary b { font-size: 21px; }
+  .card__face { padding: 14px; }
+  .card__num { font-size: 13px; }
+  .card__icon { width: 56px; height: 56px; margin: 12px 0 14px; }
+  .card__name { font-size: clamp(14px, 4.4vw, 20px); overflow-wrap: anywhere; }
+  .card__sphere { font-size: 12px; }
+  .card__hint { font-size: 13px; }
+  .card__back .card__name { font-size: 16px; }
+  .card__desc { font-size: 13px; line-height: 1.38; }
+  .card__skills span { font-size: 12px; }
+  .salary b { font-size: 23px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -442,11 +471,12 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
           <g id="world"></g>
         </svg>
 
+        <div class="floors" role="group" aria-label="Выбор этажа">
+          <button type="button" class="floor-btn" data-floor="2" aria-pressed="false" aria-label="2 этаж"><b>2</b><span>этаж</span></button>
+          <button type="button" class="floor-btn" data-floor="1" aria-pressed="true" aria-label="1 этаж"><b>1</b><span>этаж</span></button>
+        </div>
+
         <div class="plan__top" id="planTop">
-          <div class="floors" role="group" aria-label="Выбор этажа">
-            <button type="button" class="floor-btn" data-floor="1" aria-pressed="true">1 этаж</button>
-            <button type="button" class="floor-btn" data-floor="2" aria-pressed="false">2 этаж</button>
-          </div>
           <div class="legend" aria-hidden="true">
             <span><i class="lg-here"></i>Вы здесь</span>
             <span><i class="lg-hall"></i>Залы форума</span>
@@ -566,10 +596,15 @@ const PROFESSIONS = [
   { name: 'Менеджер по благополучию сотрудников', sphere: 'Город и люди', icon: 'p-heart', salary: 130000, skills: ['HR', 'Психология'], desc: 'Заботится о здоровье, финансовой грамотности и развитии сотрудников — чтобы людям хотелось работать и расти.' },
 ];
 
+// На вертикальных экранах 1 этаж разворачиваем вертикально — как на исходном плане, без пустот
+const PORTRAIT = matchMedia('(orientation: portrait)');
+if (PORTRAIT.matches) FLOORS[1].rotate = 90;
+PORTRAIT.addEventListener('change', () => location.reload());
+// маршрут начинается от стойки; точка стойки поворачивается вместе с этажом
+PATHS[KIOSK.floor].nodes.K = [KIOSK.x, KIOSK.y];
 // названия и штриховка помещений из админки (data/schedule.js → rooms)
 prepareRooms(SCHEDULE.rooms || {});
-// маршрут начинается от стойки
-PATHS[KIOSK.floor].nodes.K = [KIOSK.x, KIOSK.y];
+[KIOSK.x, KIOSK.y] = PATHS[KIOSK.floor].nodes.K;
 
 /* ==========================================================================
    Логика
@@ -606,9 +641,10 @@ const plan = (() => {
   const sbW = () => (sbOpen() && !portrait() ? $('#sidebar').offsetWidth : 0);
   const sbH = () => (sbOpen() && portrait() ? $('#sidebar').offsetHeight + 40 : 0);
   const W = () => box.clientWidth;
-  const availW = () => Math.max(200, W() - sbW());
+  const left = () => $('.floors').offsetWidth + 24;   // место под переключатель этажей
+  const availW = () => Math.max(200, W() - sbW() - left());
   const H = () => Math.max(200, box.clientHeight - sbH());
-  const top = () => ($('#planTop').offsetHeight || 44) + 20; // место под переключатель этажей и легенду
+  const top = () => $('#planTop').offsetHeight + 16;   // место под легенду
 
   function apply(anim) {
     world.classList.toggle('is-anim', !!anim);
@@ -616,7 +652,8 @@ const plan = (() => {
   }
   function clamp() {
     const { w, h } = dims(), Wd = w * s, Hd = h * s, m = 60, aw = availW(), ah = H() - top();
-    x = Wd <= aw ? (aw - Wd) / 2 : Math.min(m, Math.max(aw - Wd - m, x));
+    const l = left();
+    x = Wd <= aw ? l + (aw - Wd) / 2 : Math.min(l + m, Math.max(l + aw - Wd - m, x));
     y = Hd <= ah ? top() + (ah - Hd) / 2 : Math.min(top() + m, Math.max(H() - Hd - m, y));
   }
   function fit(anim = true) {
@@ -624,14 +661,14 @@ const plan = (() => {
     base = Math.min(availW() / w, (H() - top()) / h) * 0.94;
     s = base; clamp(); apply(anim);
   }
-  function zoomAt(f, cx = availW() / 2, cy = H() / 2, anim = false) {
+  function zoomAt(f, cx = left() + availW() / 2, cy = H() / 2, anim = false) {
     const ns = Math.min(base * 5, Math.max(base, s * f));
     x = cx - (cx - x) * (ns / s); y = cy - (cy - y) * (ns / s); s = ns;
     clamp(); apply(anim);
   }
   function focus([rx, ry, rw, rh]) {
     s = Math.min(base * 3, Math.max(base * 1.3, Math.min(availW() * 0.5 / rw, H() * 0.5 / rh)));
-    x = availW() / 2 - (rx + rw / 2) * s; y = (H() + top()) / 2 - (ry + rh / 2) * s;
+    x = left() + availW() / 2 - (rx + rw / 2) * s; y = (H() + top()) / 2 - (ry + rh / 2) * s;
     clamp(); apply(true);
   }
   function setFloor(f) { floor = f; fit(false); }
@@ -828,7 +865,10 @@ function drawRoute(f, animate) {
     [{ strokeDashoffset: len }, { strokeDashoffset: 0 }], { duration: dur, easing: 'ease-in-out', fill: 'forwards' });
   // запасной таймер — на случай, если браузер не сообщит об окончании анимации
   return Promise.race([anim.finished.catch(() => {}), wait(dur + 150)])
-    .then(() => g.querySelector('.route__end').setAttribute('opacity', 1));
+    .then(() => {
+      g.querySelector('.route__reveal').setAttribute('stroke-dashoffset', 0);   // линия видна целиком в любом случае
+      g.querySelector('.route__end').setAttribute('opacity', 1);
+    });
 }
 
 function showStep(text) { const s = $('#routeStep'); s.querySelector('span').textContent = text; s.hidden = false; }

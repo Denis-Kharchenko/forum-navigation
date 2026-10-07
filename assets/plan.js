@@ -33,15 +33,16 @@ function installPlanDefs(svg) {
   svg.insertBefore(defs, svg.firstChild);
 }
 
-// Поворот этажа на 90° против часовой стрелки: пересчитываем координаты, подписи остаются горизонтальными
+// Поворот этажа на 90°: rotate -90 — против часовой стрелки, 90 — по часовой.
+// Пересчитываем координаты, подписи остаются горизонтальными
 function rotateFloors() {
   Object.entries(FLOORS).forEach(([f, fl]) => {
-    if (fl.rotate !== -90) return;
-    const W = fl.w;
-    const rr = ([x, y, w, h]) => [y, W - x - w, h, w];
-    const rp = ([x, y]) => [y, W - x];
+    if (fl.rotate !== -90 && fl.rotate !== 90) return;
+    const W = fl.w, H = fl.h, ccw = fl.rotate === -90;
+    const rr = ccw ? ([x, y, w, h]) => [y, W - x - w, h, w] : ([x, y, w, h]) => [H - y - h, x, h, w];
+    const rp = ccw ? ([x, y]) => [y, W - x] : ([x, y]) => [H - y, x];
     fl.masses = fl.masses.map(rr);
-    [fl.w, fl.h] = [fl.h, W];
+    [fl.w, fl.h] = [H, W];
     ROOMS.filter(r => r.floor === +f).forEach(r => {
       if (r.rect) r.rect = rr(r.rect);
       if (r.poly) r.poly = r.poly.map(rp);
