@@ -9,6 +9,8 @@ window.FORUM_SCHEDULE = {
     {"id":"t4","name":"Трек 4","color":"#0E7C70"},
     {"id":"t5","name":"Трек 5","color":"#C45A00"}
   ],
+  "rooms": {
+  },
   "items": [
     {"start":"09:00","end":"10:00","kind":"Общее","title":"Сбор и регистрация участников","speaker":"","room":"r1","place":"","track":"all"},
     {"start":"10:00","end":"10:30","kind":"Общее","title":"Открытие форума","speaker":"","room":"","place":"Главная сцена","track":"all"},

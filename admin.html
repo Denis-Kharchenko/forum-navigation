@@ -6,6 +6,7 @@
 <meta name="robots" content="noindex">
 <title>Админка программы</title>
 <link rel="stylesheet" href="assets/fonts/fonts.css">
+<link rel="stylesheet" href="assets/plan.css">
 <style>
 :root {
   --blue: #2450EC;
@@ -98,6 +99,37 @@ tbody tr td:first-child { box-shadow: inset 5px 0 0 var(--c, #9a9aa5); padding-l
 .all-check input { width: 18px; height: 18px; min-height: 0; margin: 0; flex: none; }
 td select:disabled { background: #f1f1ee; color: var(--ink-2); }
 
+/* разделы админки */
+.sections { display: flex; gap: 0; margin-bottom: 20px; border-bottom: 2px solid var(--blue-soft); }
+.stab { min-height: 48px; padding: 0 22px; border: 0; background: none; font-family: var(--f-display); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; font-size: 16px; color: var(--ink-2); box-shadow: inset 0 -3px 0 transparent; }
+.stab[aria-selected="true"] { color: var(--blue); box-shadow: inset 0 -3px 0 var(--blue); }
+
+/* помещения */
+.rfloors { display: flex; margin-bottom: 12px; border: 2px solid var(--blue); width: max-content; }
+.rfloor { min-height: 42px; padding: 0 18px; border: 0; background: var(--white); color: var(--blue); font-family: var(--f-display); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; font-size: 15px; }
+.rfloor[aria-pressed="true"] { background: var(--blue); color: var(--white); }
+.rooms-edit { display: grid; grid-template-columns: minmax(0, 1fr) 460px; gap: 20px; align-items: start; }
+.mini-plan { background-color: #fbfbf9; background-image: linear-gradient(var(--blue-soft) 1px, transparent 1px), linear-gradient(90deg, var(--blue-soft) 1px, transparent 1px); background-size: 24px 24px; border: 1px solid var(--line); }
+.mini-plan svg { display: block; width: 100%; height: auto; max-height: min(72vh, 760px); }
+.room-list { background: var(--white); border-top: 4px solid var(--blue); max-height: min(72vh, 760px); overflow-y: auto; }
+.room-row { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto 40px; gap: 8px; align-items: center; padding: 8px 10px; border-bottom: 1px solid var(--blue-soft); }
+.room-row.is-sel { background: var(--blue-soft); box-shadow: inset 4px 0 0 var(--red); }
+.room-row.is-hatched .room-fields input { background: #f4f4f1; }
+.room-badge { width: 34px; height: 34px; display: grid; place-items: center; font-family: var(--f-display); font-weight: 700; font-size: 14px; color: var(--white); background: var(--blue); }
+.room-badge--staff { background: var(--red); }
+.room-badge--other { background: var(--ink-2); }
+.room-badge--service { background: repeating-linear-gradient(-45deg, #f4f4f1 0 4px, #b8b8b2 4px 6px); color: var(--ink); }
+.room-fields { display: grid; gap: 4px; min-width: 0; }
+.room-fields input { min-height: 36px; padding: 0 8px; border: 1px solid #d6dbea; background: var(--white); width: 100%; min-width: 0; }
+.room-fields input[data-k="sub"] { min-height: 30px; font-size: 13px; }
+.room-fields input:focus { border-color: var(--blue); outline: none; box-shadow: 0 0 0 2px var(--blue-soft); }
+.hatch-check { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--ink-2); cursor: pointer; white-space: nowrap; }
+.hatch-check input { width: 18px; height: 18px; margin: 0; }
+.reset { width: 40px; height: 40px; border: 0; background: none; color: var(--ink-2); display: grid; place-items: center; }
+.reset:hover:not(:disabled) { color: var(--blue); background: var(--blue-soft); }
+.reset:disabled { opacity: .25; cursor: default; }
+@media (max-width: 1100px) { .rooms-edit { grid-template-columns: 1fr; } }
+
 .table-wrap { background: var(--white); border-top: 4px solid var(--blue); overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; min-width: 1260px; }
 th { text-align: left; font-family: var(--f-display); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; font-size: 12px; color: var(--ink-2); padding: 10px 8px; border-bottom: 2px solid var(--blue-soft); background: var(--white); }
@@ -166,6 +198,27 @@ td.bad input, td.bad select { border-color: var(--red); background: var(--red-so
 
 <!-- ===== Редактор ===== -->
 <main class="wrap" id="editor" hidden>
+  <div class="sections" role="tablist" aria-label="Разделы админки">
+    <button type="button" class="stab" role="tab" data-sec="program" aria-selected="true">Программа</button>
+    <button type="button" class="stab" role="tab" data-sec="rooms" aria-selected="false">Помещения</button>
+  </div>
+
+  <section id="secRooms" hidden>
+    <section class="panel">
+      <h2>Помещения</h2>
+      <p>Нажмите на помещение на плане или в списке, чтобы переименовать его. «Заштриховать» убирает помещение из навигации стойки: на плане оно заштриховано, но подписано. Снимите галочку, чтобы вернуть.</p>
+      <div class="rfloors" role="group" aria-label="Этаж">
+        <button type="button" class="rfloor" data-floor="1" aria-pressed="true">1 этаж</button>
+        <button type="button" class="rfloor" data-floor="2" aria-pressed="false">2 этаж</button>
+      </div>
+      <div class="rooms-edit">
+        <div class="mini-plan"><svg id="adminPlan" preserveAspectRatio="xMidYMid meet" role="img" aria-label="План этажа"><g id="adminWorld"></g></svg></div>
+        <div class="room-list" id="roomList"></div>
+      </div>
+    </section>
+  </section>
+
+  <section id="secProgram">
   <div class="meta">
     <div class="field">
       <label for="evDate">Дата форума</label>
@@ -209,14 +262,17 @@ td.bad input, td.bad select { border-color: var(--red); background: var(--red-so
   </div>
   <button type="button" class="btn add-row" id="btnAdd">+ Добавить лекцию</button>
   <p class="hint">Записи автоматически сортируются по времени при сохранении. Галочка «Применить ко всем трекам» показывает запись во всех треках — для открытия, обеда, нетворкинга. Если одно и то же место занято двумя лекциями одновременно, админка предупредит.</p>
+  </section>
 </main>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-undo" viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/></symbol>
   <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></symbol>
 </svg>
 
 <script src="data/rooms.js"></script>
 <script src="data/schedule.js"></script>
+<script src="assets/plan.js"></script>
 <script>
 /* Куда сохраняется программа */
 const REPO = { owner: 'Denis-Kharchenko', repo: 'forum-navigation', branch: 'main', path: 'data/schedule.js' };
@@ -244,12 +300,14 @@ const $$ = s => [...document.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const toMin = t => { const [h, m] = String(t).split(':').map(Number); return h * 60 + m; };
 
-// Места, которые можно выбрать: помещения с list: true из data/rooms.js
-const PLACES = ROOMS.filter(r => r.list).map(r => ({
-  id: r.id, floor: r.floor,
-  name: [...(r.t1 || [])].join(' ').replace('- ', '') + (r.t2 && r.type === 'hall' ? ' · ' + r.t2.join(' ') : ''),
-}));
-const placeName = it => it.room ? (PLACES.find(p => p.id === it.room)?.name || it.room) : (it.place || '');
+// Названия и штриховка помещений (из data/schedule.js → rooms). Поворот этажей — один раз
+let roomsOv = {};
+prepareRooms(roomsOv);
+const roomById = id => ROOMS.find(r => r.id === id);
+const roomLabel = r => r.title + (r.sub && r.type === 'hall' ? ' · ' + r.sub : '');
+// Места, которые можно выбрать: незаштрихованные помещения
+const places = () => ROOMS.filter(r => r.list).map(r => ({ id: r.id, floor: r.floor, name: roomLabel(r) }));
+const placeName = it => it.room ? (roomById(it.room)?.title || it.room) : (it.place || '');
 
 let token = null, sha = null, dirty = false, mode = 'api';
 
@@ -288,6 +346,9 @@ window.FORUM_SCHEDULE = {
   "tracks": [
 ${data.tracks.map(t => '    ' + JSON.stringify(t)).join(',\n')}
   ],
+  "rooms": {
+${Object.entries(data.rooms || {}).map(([id, o]) => '    ' + JSON.stringify(id) + ': ' + JSON.stringify(o)).join(',\n')}
+  },
   "items": [
 ${items}
   ]
@@ -324,7 +385,10 @@ async function loadRemote() {
 
 /* ---------- Таблица ---------- */
 function placeSelect(it) {
-  const byFloor = f => PLACES.filter(p => p.floor === f)
+  const list = places(), cur = it.room && roomById(it.room);
+  // помещение заштриховано, но в записи выбрано — оставляем в списке, чтобы не потерять
+  if (cur && !cur.list) list.push({ id: cur.id, floor: cur.floor, name: roomLabel(cur) + ' (заштриховано)' });
+  const byFloor = f => list.filter(p => p.floor === f)
     .map(p => `<option value="${p.id}"${it.room === p.id ? ' selected' : ''}>${esc(p.name)}</option>`).join('');
   const isOther = !it.room && it.place;
   return `<select data-f="room">
@@ -377,6 +441,9 @@ function renderTabs() {
     `<button type="button" class="ttab" role="tab" style="${t.color ? '--c:' + esc(t.color) : ''}" aria-selected="${trackTab === t.id}" data-tab="${t.id}">${esc(t.name)}<small>${t.id === ALL ? $$('#rows tr').length : count(t.id)}</small></button>`).join('');
 }
 function fill(data) {
+  roomsOv = JSON.parse(JSON.stringify(data.rooms || {}));
+  prepareRooms(roomsOv);
+  renderRoomsEditor();
   if (data.tracks && data.tracks.length) tracks = data.tracks.map(t => ({ ...t }));
   renderTracks();
   $('#evDate').value = data.date || '';
@@ -393,7 +460,7 @@ function readRow(tr) {
     track: tr.querySelector('[data-f="all"]').checked ? ALL : v('track'),
   };
 }
-const readAll = () => ({ date: $('#evDate').value, tracks: tracks.map(t => ({ ...t, name: t.name.trim() || t.id })), items: $$('#rows tr').map(readRow) });
+const readAll = () => ({ date: $('#evDate').value, tracks: tracks.map(t => ({ ...t, name: t.name.trim() || t.id })), rooms: roomsDiff(), items: $$('#rows tr').map(readRow) });
 
 /* ---------- Проверки ---------- */
 function validate() {
@@ -406,6 +473,7 @@ function validate() {
     if (!it.title) { mark(i, 'title'); issues.push(`${n}: не указано название`); }
     if (it.start && it.end && toMin(it.end) <= toMin(it.start)) { mark(i, 'end'); issues.push(`${n}: конец раньше начала`); }
     if (!it.room && !it.place) { mark(i, 'room'); issues.push(`${n}: не выбрано место`); }
+    if (it.room && roomById(it.room) && !roomById(it.room).list) { mark(i, 'room'); issues.push(`${n}: «${placeName(it)}» заштриховано на плане — на стойке не будет маршрута`); }
   });
   // Пересечения в одном зале
   items.forEach((a, i) => items.forEach((b, j) => {
@@ -429,7 +497,7 @@ function refresh() {
   // фильтр по месту
   const cur = $('#filter').value || 'all';
   $('#filter').innerHTML = `<option value="all">Все места</option>` +
-    PLACES.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('') + `<option value="${OTHER}">Другие места</option>`;
+    places().map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('') + `<option value="${OTHER}">Другие места</option>`;
   $('#filter').value = cur;
   applyFilter();
   validate();
@@ -527,6 +595,99 @@ $('#trackTabs').addEventListener('click', e => {
   applyFilter();
 });
 $('#filter').addEventListener('change', applyFilter);
+
+/* ---------- Помещения ---------- */
+let roomFloor = 1, roomSel = null;
+// Отличия от исходных данных — только они попадают в файл
+function roomDiff(r) {
+  const o = {};
+  if (r.title !== r.base.title) o.name = r.title;
+  if (r.sub !== r.base.sub) o.sub = r.sub;
+  if (isHatched(r) !== (r.base.type === 'service')) o.hatched = isHatched(r);
+  return o;
+}
+function roomsDiff() {
+  const out = {};
+  ROOMS.filter(isEditable).forEach(r => { const o = roomDiff(r); if (Object.keys(o).length) out[r.id] = o; });
+  return out;
+}
+function drawAdminPlan() {
+  const { w, h } = FLOORS[roomFloor];
+  $('#adminPlan').setAttribute('viewBox', `-12 -12 ${w + 24} ${h + 24}`);
+  $('#adminPlan').style.aspectRatio = `${w + 24} / ${h + 24}`;   // высота по пропорциям этажа
+  renderPlan($('#adminWorld'), roomFloor, { clickable: isEditable, onSelect: id => selectEditRoom(id, true) });
+  markRoomSel();
+}
+function roomRowHTML(r) {
+  const changed = Object.keys(roomDiff(r)).length > 0;
+  return `<div class="room-row${isHatched(r) ? ' is-hatched' : ''}" data-id="${r.id}">
+    <span class="room-badge room-badge--${r.type}" aria-hidden="true">${esc(r.badge || '')}</span>
+    <div class="room-fields">
+      <input data-k="name" value="${esc(r.title)}" placeholder="${esc(r.base.title)}" aria-label="Название помещения" maxlength="60">
+      <input data-k="sub" value="${esc(r.sub)}" placeholder="Подзаголовок (необязательно)" aria-label="Подзаголовок" maxlength="60">
+    </div>
+    <label class="hatch-check"><input type="checkbox" data-k="hatched"${isHatched(r) ? ' checked' : ''}> Заштриховать</label>
+    <button type="button" class="reset" data-k="reset" title="Вернуть как было" aria-label="Вернуть как было"${changed ? '' : ' disabled'}><svg class="ico"><use href="#i-undo"/></svg></button>
+  </div>`;
+}
+function renderRoomsEditor() {
+  $$('.rfloor').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.floor === roomFloor)));
+  $('#roomList').innerHTML = ROOMS.filter(r => r.floor === roomFloor && isEditable(r)).map(roomRowHTML).join('');
+  drawAdminPlan();
+}
+function markRoomSel() {
+  $$('#adminWorld [data-id]').forEach(el => el.classList.toggle('is-active', el.dataset.id === roomSel));
+  $$('.room-row').forEach(el => el.classList.toggle('is-sel', el.dataset.id === roomSel));
+}
+function selectEditRoom(id, fromPlan) {
+  roomSel = id; markRoomSel();
+  if (!fromPlan) return;
+  const row = $(`.room-row[data-id="${id}"]`);
+  if (row) { row.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); row.querySelector('[data-k="name"]').focus(); }
+}
+// Названия мест в таблице программы — после переименования или штриховки
+function refreshPlaceCells() {
+  $$('#rows tr').forEach(tr => {
+    const it = readRow(tr);
+    tr.querySelector('[data-f="room"]').closest('td').innerHTML = placeSelect(it);
+  });
+}
+// Изменение помещения: сохранить в roomsOv, пересчитать и перерисовать
+function updateRoom(id, patch, fullRender) {
+  roomsOv[id] = { ...(roomsOv[id] || {}), ...patch };
+  prepareRooms(roomsOv);
+  if (fullRender) renderRoomsEditor(); else drawAdminPlan();
+  const r = roomById(id), row = $(`.room-row[data-id="${id}"]`);
+  if (row) row.querySelector('[data-k="reset"]').disabled = !Object.keys(roomDiff(r)).length;
+  refreshPlaceCells(); refresh(); setDirty(true);
+}
+$('#roomList').addEventListener('input', e => {
+  const k = e.target.dataset.k, id = e.target.closest('.room-row')?.dataset.id;
+  if (k === 'name' || k === 'sub') updateRoom(id, { [k]: e.target.value }, false);
+});
+$('#roomList').addEventListener('change', e => {
+  const id = e.target.closest('.room-row')?.dataset.id;
+  if (e.target.dataset.k === 'hatched') { roomSel = id; updateRoom(id, { hatched: e.target.checked }, true); }
+});
+$('#roomList').addEventListener('click', e => {
+  const b = e.target.closest('[data-k="reset"]');
+  if (!b) return;
+  const id = b.closest('.room-row').dataset.id;
+  delete roomsOv[id];
+  prepareRooms(roomsOv); renderRoomsEditor(); refreshPlaceCells(); refresh(); setDirty(true);
+});
+$('#roomList').addEventListener('focusin', e => {
+  const id = e.target.closest('.room-row')?.dataset.id;
+  if (id && id !== roomSel) selectEditRoom(id, false);
+});
+$$('.rfloor').forEach(b => b.addEventListener('click', () => { roomFloor = +b.dataset.floor; roomSel = null; renderRoomsEditor(); }));
+$$('.stab').forEach(b => b.addEventListener('click', () => {
+  $$('.stab').forEach(x => x.setAttribute('aria-selected', String(x === b)));
+  $('#secProgram').hidden = b.dataset.sec !== 'program';
+  $('#secRooms').hidden = b.dataset.sec !== 'rooms';
+  if (b.dataset.sec === 'rooms') renderRoomsEditor();
+}));
+installPlanDefs($('#adminPlan'));
 
 /* ---------- Сохранение и скачивание ---------- */
 $('#btnSave').addEventListener('click', async () => {

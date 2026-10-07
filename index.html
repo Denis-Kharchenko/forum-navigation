@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Навигация форума</title>
 <link rel="stylesheet" href="assets/fonts/fonts.css">
+<link rel="stylesheet" href="assets/plan.css">
 <style>
 /* ===== Токены — как на forum-rm2026.ru ===== */
 :root {
@@ -111,30 +112,6 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 #world { transform-origin: 0 0; }
 #world.is-anim { transition: transform .45s var(--ease); }
 
-.mass-stroke { fill: none; stroke: var(--ink); stroke-width: 12; stroke-linejoin: miter; }
-.mass-fill { fill: var(--white); }
-.room { stroke: #b9c1d9; stroke-width: 2; vector-effect: non-scaling-stroke; transition: fill .2s; }
-.room--hall { fill: var(--blue-soft); stroke: var(--blue); stroke-width: 1.5; }
-.room--main { fill: #F4F7FF; stroke: var(--blue); stroke-width: 1.5; }
-.room--staff { fill: var(--red-soft); stroke: #e3a3a6; }
-.room--other { fill: var(--white); }
-.room--service { fill: url(#pat-service); stroke: #c9c9c4; }
-.room--stairs { fill: url(#pat-stairs-v); }
-.room--stairs.is-h { fill: url(#pat-stairs-h); }
-.room--lift { fill: #f1f1ee; }
-.room--terrace { fill: url(#pat-terrace); stroke: #b9c1d9; stroke-dasharray: 6 4; }
-.room--roof { fill: url(#pat-roof); stroke: #d4d4d0; stroke-dasharray: 6 4; }
-.room.is-click { cursor: pointer; }
-.room.is-click:hover { filter: brightness(.97); }
-.room.is-active { fill: var(--blue); stroke: var(--blue-deep); }
-.room--staff.is-active { fill: var(--red); stroke: var(--red); }
-
-.lbl { pointer-events: none; text-anchor: middle; dominant-baseline: central; }
-.lbl .t1 { font-family: var(--f-display); font-weight: 700; text-transform: uppercase; fill: var(--blue); letter-spacing: .02em; }
-.lbl .t2 { font-family: var(--f-body); font-weight: 700; fill: var(--ink); }
-.lbl .t3 { font-family: var(--f-body); font-weight: 600; fill: var(--ink-3); }
-.lbl--staff .t1 { fill: var(--red); }
-.lbl.is-active .t1, .lbl.is-active .t2 { fill: var(--white); }
 .here__pulse { fill: var(--red); transform-box: fill-box; transform-origin: center; animation: herePulse 1.8s ease-out infinite; }
 @keyframes herePulse { from { transform: scale(.6); opacity: .5; } to { transform: scale(2.2); opacity: 0; } }
 
@@ -410,13 +387,6 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
     <section class="view" id="view-nav" role="tabpanel" aria-labelledby="tab-nav">
       <div class="plan sb-open" id="plan">
         <svg class="plan__svg" id="planSvg" role="img" aria-label="План этажа. Перетаскивайте и масштабируйте пальцами">
-          <defs>
-            <pattern id="pat-stairs-v" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="#fff"/><path d="M0 0H10" stroke="#8a8a95" stroke-width="2"/></pattern>
-            <pattern id="pat-stairs-h" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="#fff"/><path d="M0 0V10" stroke="#8a8a95" stroke-width="2"/></pattern>
-            <pattern id="pat-terrace" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="14" height="14" fill="#fff"/><path d="M0 0V14" stroke="#C9D5FB" stroke-width="3"/></pattern>
-            <pattern id="pat-service" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)"><rect width="10" height="10" fill="#f4f4f1"/><path d="M0 0V10" stroke="#b8b8b2" stroke-width="2"/></pattern>
-            <pattern id="pat-roof" width="14" height="14" patternUnits="userSpaceOnUse"><rect width="14" height="14" fill="#f7f7f4"/><circle cx="7" cy="7" r="1.4" fill="#d4d4d0"/></pattern>
-          </defs>
           <g id="world"></g>
         </svg>
 
@@ -516,6 +486,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 
 <script src="data/rooms.js"></script>
 <script src="data/schedule.js"></script>
+<script src="assets/plan.js"></script>
 <script>
 /* ==========================================================================
    НАСТРОЙКИ СТОЙКИ. Помещения — в data/rooms.js, программа — в data/schedule.js
@@ -543,24 +514,8 @@ const PROFESSIONS = [
   { name: 'Менеджер по благополучию сотрудников', sphere: 'Город и люди', icon: 'p-heart', salary: 130000, skills: ['HR', 'Психология'], desc: 'Заботится о здоровье, финансовой грамотности и развитии сотрудников — чтобы людям хотелось работать и расти.' },
 ];
 
-// Поворот этажа на 90° против часовой стрелки: пересчитываем координаты, подписи остаются горизонтальными
-Object.entries(FLOORS).forEach(([f, fl]) => {
-  if (fl.rotate !== -90) return;
-  const W = fl.w;
-  const rr = ([x, y, w, h]) => [y, W - x - w, h, w];
-  fl.masses = fl.masses.map(rr);
-  [fl.w, fl.h] = [fl.h, W];
-  ROOMS.filter(r => r.floor === +f).forEach(r => {
-    if (r.rect) r.rect = rr(r.rect);
-    if (r.poly) r.poly = r.poly.map(([x, y]) => [y, W - x]);
-    if (r.label) r.label = [r.label[1], W - r.label[0]];
-  });
-  // граф маршрутов и входы в помещения поворачиваются вместе с этажом
-  const rp = ([x, y]) => [y, W - x];
-  const g = PATHS[f];
-  if (g) for (const k in g.nodes) g.nodes[k] = rp(g.nodes[k]);
-  for (const id in DOORS) if (ROOMS.find(r => r.id === id)?.floor === +f) DOORS[id] = [DOORS[id][0], rp(DOORS[id][1])];
-});
+// названия и штриховка помещений из админки (data/schedule.js → rooms)
+prepareRooms(SCHEDULE.rooms || {});
 // маршрут начинается от стойки
 PATHS[KIOSK.floor].nodes.K = [KIOSK.x, KIOSK.y];
 
@@ -569,18 +524,6 @@ PATHS[KIOSK.floor].nodes.K = [KIOSK.x, KIOSK.y];
    ========================================================================== */
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
-const SVGNS = 'http://www.w3.org/2000/svg';
-const svgEl = (tag, attrs = {}) => {
-  const el = document.createElementNS(SVGNS, tag);
-  for (const k in attrs) el.setAttribute(k, attrs[k]);
-  return el;
-};
-const bboxOf = r => {
-  if (r.rect) return r.rect;
-  const xs = r.poly.map(p => p[0]), ys = r.poly.map(p => p[1]);
-  return [Math.min(...xs), Math.min(...ys), Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys)];
-};
-
 /* --- Часы --- */
 function tick() { $('#clock').textContent = new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }); }
 tick(); setInterval(tick, 10000);
@@ -695,75 +638,11 @@ function setSidebar(open, refit = true) {
 $('#sbToggle').addEventListener('click', () => setSidebar(!$('#plan').classList.contains('sb-open')));
 
 /* --- Отрисовка этажа --- */
-// Подпись: подбираем размер шрифта, чтобы текст влез в помещение
-function drawLabel(g, r) {
-  const [bx, by, bw, bh] = bboxOf(r);
-  const cx = r.label ? r.label[0] : bx + bw / 2, cy = r.label ? r.label[1] : by + bh / 2;
-  const lines = [
-    ...(r.t1 || []).map(t => ({ t, cls: 't1', size: 30, k: 0.52 })),
-    ...(r.t2 || []).map(t => ({ t, cls: 't2', size: 20, k: 0.6 })),
-    ...(r.t3 || []).map(t => ({ t, cls: 't3', size: 16, k: 0.6 })),
-  ];
-  if (!lines.length) return;
-  const needW = Math.max(...lines.map(l => l.t.length * l.size * l.k));
-  const needH = lines.reduce((a, l) => a + l.size * 1.2, 0);
-  const fit = (fw, fh) => Math.min(1, fw * 0.86 / needW, fh * 0.8 / needH);
-  // вертикальная подпись — только если она заметно крупнее горизонтальной
-  const rotate = fit(bh, bw) > fit(bw, bh) * 1.4;
-  const f = rotate ? fit(bh, bw) : fit(bw, bh);
-  const text = svgEl('text', { class: `lbl lbl--${r.type}`, 'data-id': r.id });
-  if (rotate) text.setAttribute('transform', `rotate(-90 ${cx} ${cy})`);
-  let yy = cy - (needH * f) / 2;
-  lines.forEach(l => {
-    const sz = l.size * f;
-    const ts = svgEl('tspan', { class: l.cls, x: cx, y: yy + sz * 0.6, 'font-size': sz.toFixed(1) });
-    ts.textContent = l.cls === 't1' ? l.t.toUpperCase() : l.t;
-    text.appendChild(ts);
-    yy += sz * 1.2;
-  });
-  g.appendChild(text);
-}
-
 function renderFloor(f) {
   $$('.floor-btn').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.floor === f)));
   $('#sbFloor').textContent = `01 · Навигация · ${f} этаж`;
-  const world = $('#world');
-  world.innerHTML = '';
-  const fl = FLOORS[f];
-
-  // Стены: обводка объединения корпусов (обводка снизу, заливка сверху — внутренние стыки скрываются)
-  const strokes = svgEl('g'), fills = svgEl('g');
-  fl.masses.forEach(([x, y, w, h]) => {
-    strokes.appendChild(svgEl('rect', { x, y, width: w, height: h, class: 'mass-stroke' }));
-    fills.appendChild(svgEl('rect', { x, y, width: w, height: h, class: 'mass-fill' }));
-  });
+  renderPlan($('#world'), f, { onSelect: id => selectRoom(id, false) });
   const rooms = ROOMS.filter(r => r.floor === f);
-  // Террасы и крыши — снаружи корпуса, рисуем первыми
-  const outside = svgEl('g'), inside = svgEl('g'), labels = svgEl('g');
-  rooms.forEach(r => {
-    let el;
-    if (r.poly) el = svgEl('polygon', { points: r.poly.map(p => p.join(',')).join(' ') });
-    else {
-      const [x, y, w, h] = r.rect;
-      el = svgEl('rect', { x, y, width: w, height: h });
-    }
-    el.setAttribute('class', `room room--${r.type}${r.type === 'stairs' && r.rect[2] > r.rect[3] ? ' is-h' : ''}${r.list ? ' is-click' : ''}`);
-    el.dataset.id = r.id;
-    if (r.list) {
-      const name = [...(r.t1 || []), ...(r.t2 || [])].join(' ').replace('- ', '');
-      el.setAttribute('role', 'button'); el.setAttribute('tabindex', '0'); el.setAttribute('aria-label', name);
-      el.addEventListener('click', () => selectRoom(r.id, false));
-      el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectRoom(r.id, false); } });
-    }
-    const outer = r.type === 'terrace' || r.type === 'roof';
-    (outer ? outside : inside).appendChild(el);
-    if (r.circle) {
-      const [x, y, w, h] = r.rect;
-      outside.appendChild(svgEl('circle', { cx: x + w / 2, cy: y + h / 2, r: Math.min(w, h) / 2 - 10, fill: '#fff', stroke: '#2450EC', 'stroke-width': 2, 'stroke-dasharray': '6 4' }));
-    }
-    drawLabel(labels, r);
-  });
-  world.append(outside, strokes, fills, inside, labels);
 
   if (KIOSK.floor === f) {
     const g = svgEl('g', { 'pointer-events': 'none' });
@@ -771,7 +650,7 @@ function renderFloor(f) {
       <circle cx="${KIOSK.x}" cy="${KIOSK.y}" r="16" fill="#D00B12" stroke="#fff" stroke-width="5"/>
       <rect x="${KIOSK.x - 62}" y="${KIOSK.y - 66}" width="124" height="36" fill="#D00B12"/>
       <text x="${KIOSK.x}" y="${KIOSK.y - 48}" text-anchor="middle" dominant-baseline="central" fill="#fff" font-family="Oswald, sans-serif" font-weight="700" font-size="22" letter-spacing="1">ВЫ ЗДЕСЬ</text>`;
-    world.appendChild(g);
+    $('#world').appendChild(g);
   }
 
   // Список в сайдбаре — помещения текущего этажа
@@ -779,12 +658,11 @@ function renderFloor(f) {
   list.innerHTML = '';
   rooms.filter(r => r.list).forEach(r => {
     const li = document.createElement('li');
-    const badge = r.badge || `<svg class="ico"><use href="#${r.icon}"/></svg>`;
+    const badge = r.badge || `<svg class="ico"><use href="#${r.icon || 'i-door'}"/></svg>`;
     const kind = r.type === 'staff' ? ' room-num--staff' : r.type === 'other' ? ' room-num--other' : '';
-    const title = (r.t1 || []).join(' ').replace('- ', '');
     li.innerHTML = `<button type="button" class="room-btn" data-id="${r.id}">
         <span class="room-num${kind}" aria-hidden="true">${badge}</span>
-        <span><b>${title}</b>${r.t2 ? `<small>${r.t2.join(' ')}</small>` : ''}</span>
+        <span><b>${esc(r.title)}</b>${r.sub ? `<small>${esc(r.sub)}</small>` : ''}</span>
       </button>`;
     li.firstElementChild.addEventListener('click', () => selectRoom(r.id, true));
     list.appendChild(li);
@@ -810,9 +688,9 @@ function selectRoom(id, focusPlan = true, stay = false) {
   selected = id;
   markSelection();
   $('#dKicker').textContent = `${r.floor} этаж`;
-  $('#dTitle').textContent = (r.t1 || []).join(' ').replace('- ', '');
-  $('#dSub').textContent = (r.t2 || []).join(' ');
-  $('#dSub').hidden = !r.t2;
+  $('#dTitle').textContent = r.title;
+  $('#dSub').textContent = r.sub;
+  $('#dSub').hidden = !r.sub;
   $('#detail').classList.toggle('is-staff', r.type === 'staff');
   const hint = $('#dHint');
   hint.hidden = r.floor === KIOSK.floor;
@@ -938,7 +816,8 @@ $('#dRoute').addEventListener('click', () => selected && playRoute(selected));
 /* --- Программа (данные из data/schedule.js) --- */
 const toMin = t => { const [h, m] = String(t).split(':').map(Number); return h * 60 + m; };
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const roomName = id => { const r = ROOMS.find(r => r.id === id); return r ? [...(r.t1 || [])].join(' ').replace('- ', '') : ''; };
+const roomName = id => ROOMS.find(r => r.id === id)?.title || '';
+const roomActive = id => !!ROOMS.find(r => r.id === id)?.list;   // не заштриховано
 const placeOf = it => it.room ? roomName(it.room) : (it.place || '');
 const ITEMS = (SCHEDULE.items || []).filter(it => it.start && it.title)
   .sort((a, b) => toMin(a.start) - toMin(b.start) || placeOf(a).localeCompare(placeOf(b), 'ru'));
@@ -988,7 +867,7 @@ function slotHTML(it, st) {
     </div>
     <div class="slot__place">
       ${place ? `<span class="place"><svg class="ico"><use href="#i-pin"/></svg>${esc(place)}</span>` : ''}
-      ${it.room ? `<button type="button" class="btn-map" data-room="${esc(it.room)}">На плане<svg class="ico"><use href="#i-arrow"/></svg></button>` : ''}
+      ${roomActive(it.room) ? `<button type="button" class="btn-map" data-room="${esc(it.room)}">На плане<svg class="ico"><use href="#i-arrow"/></svg></button>` : ''}
     </div>
   </li>`;
 }
@@ -1088,6 +967,7 @@ function bumpIdle() { clearTimeout(idleTimer); idleTimer = setTimeout(resetKiosk
 document.addEventListener('contextmenu', e => e.preventDefault());
 
 /* --- Старт --- */
+installPlanDefs($('#planSvg'));
 renderFloor(KIOSK.floor);
 showView(location.hash.slice(1) || 'nav');
 setSidebar(true);
