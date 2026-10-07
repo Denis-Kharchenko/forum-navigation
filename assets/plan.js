@@ -97,13 +97,17 @@ function splitTwo(text) {
   return best;
 }
 
+// На телефоне план целиком мелкий — подписи крупнее (насколько позволяет размер комнаты)
+const labelScale = () => (matchMedia('(max-width: 600px)').matches ? 1.9 : 1);
+
 // Подпись: подбираем перенос и размер шрифта, чтобы текст влез в помещение
 function drawLabel(g, r) {
   const [bx, by, bw, bh] = bboxOf(r);
   const cx = r.label ? r.label[0] : bx + bw / 2, cy = r.label ? r.label[1] : by + bh / 2;
   const gray = !EDITABLE.includes(r.type) || r.type === 'service';
-  const tStyle = gray ? { cls: 't3', size: 16, k: 0.6 } : { cls: 't1', size: 30, k: 0.52 };
-  const sStyle = gray ? { cls: 't3', size: 14, k: 0.6 } : { cls: 't2', size: 20, k: 0.6 };
+  const ls = labelScale();
+  const tStyle = gray ? { cls: 't3', size: 16 * ls, k: 0.6 } : { cls: 't1', size: 30 * ls, k: 0.52 };
+  const sStyle = gray ? { cls: 't3', size: 14 * ls, k: 0.6 } : { cls: 't2', size: 20 * ls, k: 0.6 };
   const title = r.planTitle ?? r.title ?? '', sub = r.planSub ?? r.sub ?? '';
   if (!title) return;
   const variants = [[title], splitTwo(title)].filter(Boolean).map(tl => [

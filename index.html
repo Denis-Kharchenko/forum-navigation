@@ -173,7 +173,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 .route__line { fill: none; stroke: var(--red); stroke-width: 8; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 18 13; }
 .route__dot, .route__badge circle { fill: var(--red); stroke: #fff; stroke-width: 5; }
 .route__badge rect { fill: var(--red); }
-.route__badge text { fill: #fff; font-family: var(--f-display); font-weight: 700; font-size: 22px; letter-spacing: 1px; text-anchor: middle; dominant-baseline: central; }
+.route__badge text { fill: #fff; font-family: var(--f-display); font-weight: 700; letter-spacing: 1px; text-anchor: middle; dominant-baseline: central; }
 .route__end { transition: opacity .3s; }
 .btn-route { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin-top: 10px; padding: 0 14px; background: var(--red); color: var(--white); font-family: var(--f-display); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; font-size: 14px; clip-path: var(--chamfer); transition: transform .12s, background .15s; }
 .btn-route:active { transform: scale(.97); background: #a8070d; }
@@ -331,73 +331,92 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 
 /* ===== Телефон (вертикально) ===== */
 @media (max-width: 600px) {
-  :root { --gutter: 12px; --sb-h: 44%; }
-  body { font-size: 16px; }
-  .header { height: 56px; gap: 10px; }
-  .logo__mark { width: 38px; height: 37px; }
-  .clock { font-size: 24px; padding: 7px 12px 7px 10px; }
+  :root { --gutter: 14px; --sb-h: 46%; }
+  body { font-size: 18px; }
+  .header { height: 64px; gap: 10px; }
+  .logo__mark { width: 44px; height: 42px; }
+  .clock { font-size: 30px; padding: 8px 14px 8px 12px; }
 
   /* нижние вкладки: иконка над подписью */
-  .tabbar { gap: 6px; padding: 8px var(--gutter) calc(8px + env(safe-area-inset-bottom)); }
-  .tab { flex-direction: column; gap: 4px; min-height: 64px; padding: 0 4px; font-size: 13px; letter-spacing: .04em; }
-  .tab .ico { width: 26px; height: 26px; }
+  .tabbar { gap: 6px; padding: 8px 10px calc(8px + env(safe-area-inset-bottom)); }
+  .tab { flex-direction: column; gap: 5px; min-height: 76px; padding: 0 2px; font-size: 16px; letter-spacing: .03em; }
+  .tab .ico { width: 30px; height: 30px; }
 
   /* навигация */
   .plan__top { left: 8px; top: 8px; right: 8px; }
   .legend { display: none; }
   .floors { left: 8px; }
-  .floor-btn { width: 60px; height: 60px; }
-  .floor-btn b { font-size: 26px; }
-  .zoom { right: 8px; gap: 6px; }
-  .zoom button { width: 48px; height: 48px; }
-  .sb-toggle { width: 200px; height: 44px; top: -44px; font-size: 14px; }
-  .sidebar__head { padding: 12px 16px 6px; }
-  .sidebar__head .eyebrow { font-size: 12px; }
-  .sidebar__head .h2 { font-size: 26px; }
-  .rooms { grid-template-columns: 1fr; grid-auto-rows: auto; overflow-y: auto; padding: 0 12px 10px; }
-  .rooms li { min-height: 66px; }
-  .room-btn { grid-template-columns: 48px 1fr; gap: 14px; padding: 8px 8px 8px 4px; }
-  .room-num { width: 48px; height: 48px; font-size: 22px; }
-  .room-num .ico { width: 24px; height: 24px; }
-  .room-btn b { font-size: 18px; }
-  .room-btn small { font-size: 14px; }
-  .detail { margin: 0 12px 12px; padding: 12px 52px 14px 14px; }
-  .detail__kicker { font-size: 12px; }
-  .detail__title { font-size: 24px; }
-  .detail__sub { font-size: 16px; }
-  .detail__close { width: 48px; height: 48px; }
-  .detail__hint { font-size: 14px; }
-  .btn-route { min-height: 50px; font-size: 16px; padding: 0 18px; }
+  .floor-btn { width: 72px; height: 72px; }
+  .floor-btn b { font-size: 32px; }
+  .floor-btn span { font-size: 12px; }
+  .zoom { right: 8px; gap: 8px; }
+  .zoom button { width: 56px; height: 56px; }
+  .zoom .ico { width: 28px; height: 28px; }
+  .sb-toggle { width: 230px; height: 52px; top: -52px; font-size: 17px; gap: 10px; }
+  .sb-toggle .ico { width: 24px; height: 24px; }
+  .sidebar__head { padding: 14px 16px 8px; }
+  .sidebar__head .eyebrow { font-size: 14px; }
+  .sidebar__head .h2 { font-size: 32px; }
+  .rooms { grid-template-columns: 1fr; grid-auto-rows: auto; overflow-y: auto; padding: 0 14px 12px; }
+  .rooms li { min-height: 78px; }
+  .room-btn { grid-template-columns: 58px 1fr; gap: 16px; padding: 10px 8px 10px 4px; }
+  .room-num { width: 58px; height: 58px; font-size: 28px; }
+  .room-num .ico { width: 30px; height: 30px; }
+  .room-btn b { font-size: 22px; }
+  .room-btn small { font-size: 17px; }
+  .detail { margin: 0 14px 14px; padding: 16px 56px 18px 16px; }
+  .detail__kicker { font-size: 14px; }
+  .detail__title { font-size: 30px; }
+  .detail__sub { font-size: 19px; }
+  .detail__close { width: 52px; height: 52px; }
+  .detail__close .ico { width: 26px; height: 26px; }
+  .detail__hint { font-size: 17px; }
+  .detail__hint .ico { width: 22px; height: 22px; }
+  .btn-route { min-height: 60px; font-size: 20px; padding: 0 22px; margin-top: 14px; }
+  .btn-route .ico { width: 24px; height: 24px; }
   .agenda { display: none; }
-  .step { top: 12px; font-size: 16px; padding: 12px 16px; white-space: normal; width: max-content; max-width: calc(100% - 24px); text-align: left; }
+  .route__reveal { stroke-width: 80; }
+  .route__halo { stroke-width: 28; }
+  .route__line { stroke-width: 15; stroke-dasharray: 30 22; }
+  .step { top: 12px; font-size: 19px; padding: 14px 18px; white-space: normal; width: max-content; max-width: calc(100% - 24px); text-align: left; }
+  .step .ico { width: 30px; height: 30px; }
 
   /* программа и профессии: прокрутка страницы, фильтры — горизонтальной лентой */
-  .page { padding: 16px var(--gutter) 24px; gap: 14px; }
-  .eyebrow { font-size: 13px; }
-  .h2 { font-size: 28px; }
-  .lead { font-size: 14px; }
-  .chips { flex-wrap: nowrap; overflow-x: auto; margin: 0 calc(-1 * var(--gutter)); padding: 2px var(--gutter); scrollbar-width: none; width: calc(100% + 2 * var(--gutter)); }
+  .page { padding: 18px var(--gutter) 28px; gap: 16px; }
+  .eyebrow { font-size: 15px; }
+  .h2 { font-size: 36px; }
+  .lead { font-size: 17px; }
+  .chips { flex-wrap: nowrap; overflow-x: auto; margin: 0 calc(-1 * var(--gutter)); padding: 2px var(--gutter); scrollbar-width: none; width: calc(100% + 2 * var(--gutter)); gap: 8px; }
   .chips::-webkit-scrollbar { display: none; }
-  .chips .chip, .chips .chip--track { flex: none; min-height: 50px; font-size: 15px; padding: 0 18px; }
-  .slot { grid-template-columns: 64px minmax(0, 1fr); gap: 12px; padding: 14px 8px 14px 18px; }
-  .slot__time { font-size: 22px; }
-  .slot__title { white-space: normal; font-size: 17px; }
-  .slot__meta { white-space: normal; flex-wrap: wrap; font-size: 14px; }
-  .slot .kind { font-size: 12px; }
-  .slot__place { grid-column: 2; flex-wrap: wrap; margin-top: 4px; }
-  .place { font-size: 15px; }
-  .btn-map { min-height: 48px; font-size: 15px; padding: 0 16px; }
-  .cards { grid-auto-rows: 290px; gap: 10px; }
-  .card__face { padding: 14px; }
-  .card__num { font-size: 13px; }
-  .card__icon { width: 56px; height: 56px; margin: 12px 0 14px; }
-  .card__name { font-size: clamp(14px, 4.4vw, 20px); overflow-wrap: anywhere; }
-  .card__sphere { font-size: 12px; }
-  .card__hint { font-size: 13px; }
-  .card__back .card__name { font-size: 16px; }
-  .card__desc { font-size: 13px; line-height: 1.38; }
-  .card__skills span { font-size: 12px; }
-  .salary b { font-size: 23px; }
+  .chips .chip, .chips .chip--track { flex: none; min-height: 58px; font-size: 18px; padding: 0 22px; }
+  .slot { grid-template-columns: 78px minmax(0, 1fr); gap: 14px; padding: 18px 10px 18px 20px; }
+  .slot__time { font-size: 28px; }
+  .slot__title { white-space: normal; font-size: 21px; line-height: 1.25; }
+  .slot__meta { white-space: normal; flex-wrap: wrap; font-size: 17px; margin-top: 6px; }
+  .slot .kind { font-size: 14px; padding: 2px 8px; }
+  .slot__place { grid-column: 2; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+  .place { font-size: 18px; }
+  .place .ico { width: 20px; height: 20px; }
+  .btn-map { min-height: 56px; font-size: 18px; padding: 0 20px; }
+  .btn-map .ico { width: 20px; height: 20px; }
+  .pager__btn { min-height: 56px; font-size: 18px; }
+  .stub { font-size: 17px; }
+
+  /* профессии — одна колонка, крупный текст */
+  .cards { grid-template-columns: 1fr; grid-auto-rows: 300px; gap: 12px; }
+  .card__face { padding: 20px; }
+  .card__front::after { right: 30px; width: 14px; height: 80px; }
+  .card__num { font-size: 16px; }
+  .card__icon { width: 72px; height: 72px; margin: 12px 0 16px; }
+  .card__name { font-size: 30px; overflow-wrap: anywhere; }
+  .card__sphere { font-size: 15px; }
+  .card__hint { font-size: 17px; }
+  .card__hint .ico { width: 22px; height: 22px; }
+  .card__back .card__name { font-size: 24px; margin-bottom: 10px; }
+  .card__desc { font-size: 18px; line-height: 1.4; }
+  .card__skills span { font-size: 15px; padding: 4px 10px; }
+  .salary small { font-size: 13px; }
+  .salary b { font-size: 34px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -735,10 +754,11 @@ function renderFloor(f) {
 
   if (KIOSK.floor === f) {
     const g = svgEl('g', { 'pointer-events': 'none' });
-    g.innerHTML = `<circle class="here__pulse" cx="${KIOSK.x}" cy="${KIOSK.y}" r="22"/>
-      <circle cx="${KIOSK.x}" cy="${KIOSK.y}" r="16" fill="#D00B12" stroke="#fff" stroke-width="5"/>
-      <rect x="${KIOSK.x - 62}" y="${KIOSK.y - 66}" width="124" height="36" fill="#D00B12"/>
-      <text x="${KIOSK.x}" y="${KIOSK.y - 48}" text-anchor="middle" dominant-baseline="central" fill="#fff" font-family="Oswald, sans-serif" font-weight="700" font-size="22" letter-spacing="1">ВЫ ЗДЕСЬ</text>`;
+    const k = labelScale(), { x, y } = KIOSK;   // на телефоне метка крупнее
+    g.innerHTML = `<circle class="here__pulse" cx="${x}" cy="${y}" r="${22 * k}"/>
+      <circle cx="${x}" cy="${y}" r="${16 * k}" fill="#D00B12" stroke="#fff" stroke-width="${5 * k}"/>
+      <rect x="${x - 62 * k}" y="${y - 66 * k}" width="${124 * k}" height="${36 * k}" fill="#D00B12"/>
+      <text x="${x}" y="${y - 48 * k}" text-anchor="middle" dominant-baseline="central" fill="#fff" font-family="Oswald, sans-serif" font-weight="700" font-size="${22 * k}" letter-spacing="1">ВЫ ЗДЕСЬ</text>`;
     $('#world').appendChild(g);
   }
 
@@ -832,8 +852,8 @@ function computeRoute(id) {
   return a && b && { target: id, floors: [KIOSK.floor, r.floor], segs: { [KIOSK.floor]: a, [r.floor]: [...b, pt] } };
 }
 
-const badge = ([x, y], text) => `<g class="route__badge"><rect x="${x - 78}" y="${y - 70}" width="156" height="38"/>
-  <text x="${x}" y="${y - 51}">${text}</text><circle cx="${x}" cy="${y}" r="13"/></g>`;
+const badge = ([x, y], text, k = labelScale()) => `<g class="route__badge"><rect x="${x - 78 * k}" y="${y - 70 * k}" width="${156 * k}" height="${38 * k}"/>
+  <text x="${x}" y="${y - 51 * k}" font-size="${22 * k}">${text}</text><circle cx="${x}" cy="${y}" r="${13 * k}"/></g>`;
 
 // Рисует участок маршрута на этаже f. animate — постепенное появление по всей длине
 function drawRoute(f, animate) {
@@ -852,7 +872,7 @@ function drawRoute(f, animate) {
     <g mask="url(#route-mask)"><path class="route__halo" d="${d}"/><path class="route__line" d="${d}"/></g>
     ${f !== KIOSK.floor ? badge(pts[0], `С ${KIOSK.floor} ЭТАЖА`) : ''}
     <g class="route__end" opacity="${animate ? 0 : 1}">
-      ${next ? badge(end, `НА ${next} ЭТАЖ`) : `<circle class="here__pulse" cx="${end[0]}" cy="${end[1]}" r="20"/><circle class="route__dot" cx="${end[0]}" cy="${end[1]}" r="14"/>`}
+      ${next ? badge(end, `НА ${next} ЭТАЖ`) : `<circle class="here__pulse" cx="${end[0]}" cy="${end[1]}" r="${20 * labelScale()}"/><circle class="route__dot" cx="${end[0]}" cy="${end[1]}" r="${14 * labelScale()}"/>`}
     </g>`;
   $('#world').appendChild(g);
   if (!animate || reduceMotion.matches) {
