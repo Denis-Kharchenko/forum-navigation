@@ -77,8 +77,27 @@ details li { margin: 4px 0; }
 .issues { margin: 0 0 16px; padding: 12px 16px 12px 36px; background: var(--red-soft); color: var(--red); font-size: 14px; font-weight: 600; }
 .issues[hidden] { display: none; }
 
+/* треки */
+.panel { background: var(--white); padding: 16px 20px 18px; border-top: 4px solid var(--red); margin-bottom: 20px; }
+.panel h2 { font-family: var(--f-display); text-transform: uppercase; color: var(--blue); font-size: 20px; margin: 0 0 4px; }
+.panel p { margin: 0 0 12px; color: var(--ink-2); font-size: 13px; }
+.tracks-edit { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+.track-edit { display: grid; grid-template-columns: 44px 1fr; gap: 8px; align-items: center; }
+.track-edit input[type=color] { width: 44px; height: 42px; padding: 2px; border: 2px solid var(--line); background: var(--white); cursor: pointer; }
+.track-edit input[type=text] { min-height: 42px; padding: 0 10px; border: 2px solid var(--line); }
+.track-edit input[type=text]:focus { border-color: var(--blue); outline: none; }
+.track-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.ttab { min-height: 40px; padding: 0 14px; border: 2px solid var(--c, var(--ink-2)); color: var(--c, var(--ink-2)); background: var(--white); font-family: var(--f-display); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; font-size: 14px; }
+.ttab[aria-selected="true"] { background: var(--c, var(--ink-2)); color: var(--white); }
+.ttab small { opacity: .75; margin-left: 4px; }
+tbody tr td:first-child { box-shadow: inset 5px 0 0 var(--c, #9a9aa5); padding-left: 13px; }
+.col-track { width: 190px; }
+.all-check { display: flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 12.5px; font-weight: 600; color: var(--ink-2); cursor: pointer; line-height: 1.2; }
+.all-check input { width: 18px; height: 18px; min-height: 0; margin: 0; flex: none; }
+td select:disabled { background: #f1f1ee; color: var(--ink-2); }
+
 .table-wrap { background: var(--white); border-top: 4px solid var(--blue); overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; min-width: 1080px; }
+table { width: 100%; border-collapse: collapse; min-width: 1260px; }
 th { text-align: left; font-family: var(--f-display); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; font-size: 12px; color: var(--ink-2); padding: 10px 8px; border-bottom: 2px solid var(--blue-soft); background: var(--white); }
 td { padding: 6px 8px; border-bottom: 1px solid var(--blue-soft); vertical-align: top; }
 tr.is-hidden { display: none; }
@@ -157,7 +176,15 @@ td.bad input, td.bad select { border-color: var(--red); background: var(--red-so
     <span class="counter" id="counter"></span>
   </div>
 
+  <section class="panel" aria-labelledby="tracksTitle">
+    <h2 id="tracksTitle">Треки</h2>
+    <p>Названия и цвета треков — так они выглядят на стойке во вкладке «Программа».</p>
+    <div class="tracks-edit" id="tracksEdit"></div>
+  </section>
+
   <ul class="issues" id="issues" hidden></ul>
+
+  <div class="track-tabs" id="trackTabs" role="tablist" aria-label="Показать трек"></div>
 
   <div class="table-wrap">
     <table>
@@ -165,6 +192,7 @@ td.bad input, td.bad select { border-color: var(--red); background: var(--red-so
         <tr>
           <th class="col-time">Начало</th>
           <th class="col-time">Конец</th>
+          <th class="col-track">Трек</th>
           <th class="col-kind">Формат</th>
           <th>Название</th>
           <th>Спикер</th>
@@ -177,7 +205,7 @@ td.bad input, td.bad select { border-color: var(--red); background: var(--red-so
     <div class="empty" id="empty" hidden>Пока ни одной записи. Нажмите «Добавить лекцию».</div>
   </div>
   <button type="button" class="btn add-row" id="btnAdd">+ Добавить лекцию</button>
-  <p class="hint">Записи автоматически сортируются по времени при сохранении. Если одно и то же место занято двумя лекциями одновременно, админка предупредит.</p>
+  <p class="hint">Записи автоматически сортируются по времени при сохранении. Галочка «Применить ко всем трекам» показывает запись во всех треках — для открытия, обеда, нетворкинга. Если одно и то же место занято двумя лекциями одновременно, админка предупредит.</p>
 </main>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -193,6 +221,17 @@ const API = `https://api.github.com/repos/${REPO.owner}/${REPO.repo}/contents/${
 const TOKEN_KEY = 'forum-admin-token';
 const KINDS = ['Лекция', 'Кейс-лекция', 'Мастер-класс', 'Тренинг', 'Воркшоп', 'Пленарная сессия', 'Дискуссия', 'Общее'];
 const OTHER = '__other';
+const ALL = 'all';
+const DEFAULT_TRACKS = [
+  { id: 't1', name: 'Трек 1', color: '#2450EC' },
+  { id: 't2', name: 'Трек 2', color: '#D00B12' },
+  { id: 't3', name: 'Трек 3', color: '#6E35D8' },
+  { id: 't4', name: 'Трек 4', color: '#0E7C70' },
+  { id: 't5', name: 'Трек 5', color: '#C45A00' },
+];
+let tracks = DEFAULT_TRACKS.map(t => ({ ...t }));
+let trackTab = ALL;   // какой трек показан в таблице
+const trackColor = id => tracks.find(t => t.id === id)?.color || '#9a9aa5';
 
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -240,6 +279,9 @@ function buildFile(data) {
 window.FORUM_SCHEDULE = {
   "date": ${JSON.stringify(data.date)},
   "updated": ${JSON.stringify(new Date().toISOString())},
+  "tracks": [
+${data.tracks.map(t => '    ' + JSON.stringify(t)).join(',\n')}
+  ],
   "items": [
 ${items}
   ]
@@ -287,10 +329,18 @@ function placeSelect(it) {
     </select>
     <input class="other" data-f="place" placeholder="Например: Лобби" value="${esc(it.place)}"${isOther ? '' : ' hidden'}>`;
 }
+function trackCell(it) {
+  const all = (it.track || ALL) === ALL;
+  const cur = all ? (trackTab !== ALL ? trackTab : tracks[0].id) : it.track;
+  return `<select data-f="track"${all ? ' disabled' : ''}>${tracks.map(t => `<option value="${t.id}"${t.id === cur ? ' selected' : ''}>${esc(t.name)}</option>`).join('')}</select>
+    <label class="all-check"><input type="checkbox" data-f="all"${all ? ' checked' : ''}> Применить ко всем трекам</label>`;
+}
 function rowHTML(it = {}) {
-  return `<tr>
+  const tr = it.track || ALL;
+  return `<tr style="--c:${tr === ALL ? '#9a9aa5' : trackColor(tr)}">
     <td><input type="time" data-f="start" value="${esc(it.start)}" required></td>
     <td><input type="time" data-f="end" value="${esc(it.end)}"></td>
+    <td>${trackCell(it)}</td>
     <td><select data-f="kind">${KINDS.map(k => `<option${(it.kind || 'Лекция') === k ? ' selected' : ''}>${k}</option>`).join('')}</select></td>
     <td><input data-f="title" value="${esc(it.title)}" placeholder="Название лекции" required></td>
     <td><input data-f="speaker" value="${esc(it.speaker)}" placeholder="Имя, должность"></td>
@@ -298,7 +348,21 @@ function rowHTML(it = {}) {
     <td><button type="button" class="del" aria-label="Удалить запись"><svg class="ico"><use href="#i-trash"/></svg></button></td>
   </tr>`;
 }
+function renderTracks() {
+  $('#tracksEdit').innerHTML = tracks.map((t, i) => `<div class="track-edit">
+      <input type="color" value="${esc(t.color)}" data-t="${i}" data-k="color" aria-label="Цвет: ${esc(t.name)}">
+      <input type="text" value="${esc(t.name)}" data-t="${i}" data-k="name" aria-label="Название трека ${i + 1}" maxlength="40">
+    </div>`).join('');
+  renderTabs();
+}
+function renderTabs() {
+  const count = id => $$('#rows tr').filter(tr => readRow(tr).track === id).length;
+  $('#trackTabs').innerHTML = [{ id: ALL, name: 'Все треки' }, ...tracks].map(t =>
+    `<button type="button" class="ttab" role="tab" style="${t.color ? '--c:' + esc(t.color) : ''}" aria-selected="${trackTab === t.id}" data-tab="${t.id}">${esc(t.name)}<small>${t.id === ALL ? $$('#rows tr').length : count(t.id)}</small></button>`).join('');
+}
 function fill(data) {
+  if (data.tracks && data.tracks.length) tracks = data.tracks.map(t => ({ ...t }));
+  renderTracks();
   $('#evDate').value = data.date || '';
   $('#rows').innerHTML = (data.items || []).map(rowHTML).join('');
   refresh();
@@ -310,9 +374,10 @@ function readRow(tr) {
     start: v('start'), end: v('end'), kind: v('kind'), title: v('title'), speaker: v('speaker'),
     room: room === OTHER ? '' : room,
     place: room === OTHER ? v('place') : '',
+    track: tr.querySelector('[data-f="all"]').checked ? ALL : v('track'),
   };
 }
-const readAll = () => ({ date: $('#evDate').value, items: $$('#rows tr').map(readRow) });
+const readAll = () => ({ date: $('#evDate').value, tracks: tracks.map(t => ({ ...t, name: t.name.trim() || t.id })), items: $$('#rows tr').map(readRow) });
 
 /* ---------- Проверки ---------- */
 function validate() {
@@ -335,6 +400,7 @@ function validate() {
       issues.push(`Строки ${i + 1} и ${j + 1}: «${placeName(a)}» занят в одно время`);
     }
   }));
+  tracks.forEach((t, i) => { if (!t.name.trim()) issues.push(`Трек ${i + 1}: не указано название`); });
   $('#issues').innerHTML = issues.map(t => `<li>${esc(t)}</li>`).join('');
   $('#issues').hidden = !issues.length;
   return issues;
@@ -356,8 +422,11 @@ function applyFilter() {
   const f = $('#filter').value;
   $$('#rows tr').forEach(tr => {
     const it = readRow(tr);
-    tr.classList.toggle('is-hidden', f !== 'all' && (f === OTHER ? !!it.room : it.room !== f));
+    const byPlace = f !== 'all' && (f === OTHER ? !!it.room : it.room !== f);
+    const byTrack = trackTab !== ALL && it.track !== ALL && it.track !== trackTab;
+    tr.classList.toggle('is-hidden', byPlace || byTrack);
   });
+  renderTabs();
 }
 function sortRows() {
   const data = readAll();
@@ -368,6 +437,13 @@ function sortRows() {
 /* ---------- События таблицы ---------- */
 $('#rows').addEventListener('input', () => { setDirty(true); validate(); });
 $('#rows').addEventListener('change', e => {
+  if (e.target.dataset.f === 'all' || e.target.dataset.f === 'track') {
+    const tr = e.target.closest('tr'), sel = tr.querySelector('[data-f="track"]');
+    sel.disabled = tr.querySelector('[data-f="all"]').checked;
+    const it = readRow(tr);
+    tr.style.setProperty('--c', it.track === ALL ? '#9a9aa5' : trackColor(it.track));
+    applyFilter();
+  }
   if (e.target.dataset.f === 'room') {
     const other = e.target.parentElement.querySelector('.other');
     other.hidden = e.target.value !== OTHER;
@@ -387,11 +463,30 @@ $('#btnAdd').addEventListener('click', () => {
   const prev = last ? readRow(last) : {};
   const f = $('#filter').value;
   // новая запись начинается там, где закончилась предыдущая, и в выбранном в фильтре зале
-  $('#rows').insertAdjacentHTML('beforeend', rowHTML({ start: prev.end || '', room: f !== 'all' && f !== OTHER ? f : '' }));
+  $('#rows').insertAdjacentHTML('beforeend', rowHTML({
+    start: prev.end || '', room: f !== 'all' && f !== OTHER ? f : '',
+    track: trackTab !== ALL ? trackTab : (prev.track && prev.track !== ALL ? prev.track : tracks[0].id),
+  }));
   setDirty(true); refresh();
   $$('#rows tr').at(-1).querySelector('[data-f="title"]').focus();
 });
 $('#evDate').addEventListener('input', () => setDirty(true));
+$('#tracksEdit').addEventListener('input', e => {
+  const i = +e.target.dataset.t, k = e.target.dataset.k;
+  if (Number.isNaN(i)) return;
+  tracks[i][k] = e.target.value;
+  const id = tracks[i].id;
+  // обновить названия в выпадающих списках и цвет строк этого трека
+  $$(`#rows [data-f="track"] option[value="${id}"]`).forEach(o => { o.textContent = tracks[i].name; });
+  $$('#rows tr').forEach(tr => { if (readRow(tr).track === id) tr.style.setProperty('--c', tracks[i].color); });
+  renderTabs(); setDirty(true); validate();
+});
+$('#trackTabs').addEventListener('click', e => {
+  const b = e.target.closest('.ttab');
+  if (!b) return;
+  trackTab = b.dataset.tab;
+  applyFilter();
+});
 $('#filter').addEventListener('change', applyFilter);
 
 /* ---------- Сохранение и скачивание ---------- */
