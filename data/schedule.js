@@ -1,7 +1,7 @@
 /* Программа форума. Файл записывает админка (admin.html) — вручную лучше не править. */
 window.FORUM_SCHEDULE = {
   "date": "2026-10-23",
-  "updated": "2026-10-07T11:45:07.314Z",
+  "updated": "2026-10-07T11:47:25.993Z",
   "tracks": [
     {"id":"t1","name":"Созидая общество","color":"#f31ba4"},
     {"id":"t2","name":"Созидая Культуру","color":"#ced123"},
@@ -14,10 +14,7 @@ window.FORUM_SCHEDULE = {
     "r8": {"sub":"Спикеров","hatched":true}
   },
   "items": [
-    {"start":"09:00","end":"10:00","kind":"Общее","title":"Сбор и регистрация участников","speaker":"","room":"r1","place":"","track":"all"},
-    {"start":"10:00","end":"10:30","kind":"Общее","title":"Открытие форума","speaker":"","room":"r2","place":"","track":"all"},
-    {"start":"13:00","end":"14:00","kind":"Общее","title":"Обед","speaker":"","room":"","place":"Лобби «АТС»","track":"all"},
-    {"start":"17:00","end":"17:30","kind":"Общее","title":"Нетворкинг","speaker":"","room":"","place":"Главная сцена","track":"all"},
-    {"start":"17:30","end":"17:45","kind":"Общее","title":"Завершение форума","speaker":"","room":"","place":"Главная сцена","track":"all"}
+    {"start":"09:00","end":"10:00","kind":"Общее","title":"Регистрация участников","speaker":"","room":"","place":"ГастроЛобби \"АТС\"","track":"t6"},
+    {"start":"10:00","end":"10:30","kind":"Общее","title":"Торежственное открытие ФРМ-2026","speaker":"","room":"r7","place":"","track":"t6"}
   ]
 };
