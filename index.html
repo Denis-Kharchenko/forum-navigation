@@ -49,7 +49,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 :focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
 .ico { width: 20px; height: 20px; flex: none; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-.app { height: 100dvh; display: grid; grid-template-rows: auto 1fr auto; }
+.app { height: 100dvh; display: grid; grid-template-rows: auto 1fr auto; grid-template-columns: minmax(0, 1fr); }
 
 /* ===== Шапка ===== */
 .header {
@@ -89,7 +89,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 
 /* ===== Вкладки ===== */
 .tabbar {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;
   padding: 8px var(--gutter) calc(8px + env(safe-area-inset-bottom));
   background: var(--white); border-top: 1px solid var(--line);
 }
@@ -317,6 +317,58 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
   .slot { padding: 10px 8px; min-height: 64px; }
   .cards { flex: none; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: none; grid-auto-rows: 300px; }
   :root { --sb-w: 280px; }
+}
+
+/* ===== Телефон (вертикально) ===== */
+@media (max-width: 600px) {
+  :root { --gutter: 12px; --sb-h: 48%; }
+  body { font-size: 15px; }
+  .header { height: 52px; gap: 10px; }
+  .logo__mark { width: 34px; height: 33px; }
+  .clock { font-size: 22px; padding: 6px 10px 6px 9px; }
+
+  /* нижние вкладки: иконка над подписью */
+  .tabbar { gap: 6px; padding: 6px var(--gutter) calc(6px + env(safe-area-inset-bottom)); }
+  .tab { flex-direction: column; gap: 3px; min-height: 56px; padding: 0 4px; font-size: 12px; letter-spacing: .04em; }
+  .tab .ico { width: 22px; height: 22px; }
+
+  /* навигация: легенда скрыта, список помещений — выезжающая снизу шторка с прокруткой */
+  .plan__top { left: 8px; top: 8px; right: 8px; }
+  .legend { display: none; }
+  .floor-btn { min-height: 44px; padding: 0 14px; font-size: 15px; }
+  .zoom { right: 8px; gap: 4px; }
+  .zoom button { width: 44px; height: 44px; }
+  .sb-toggle { width: 160px; height: 38px; top: -38px; font-size: 12px; }
+  .sidebar__head { padding: 10px 14px 6px; }
+  .sidebar__head .h2 { font-size: 22px; }
+  .rooms { grid-template-columns: 1fr; overflow-y: auto; padding: 0 12px 8px; }
+  .rooms li { min-height: 52px; }
+  .detail { margin: 0 12px 10px; padding: 10px 48px 10px 12px; }
+  .detail__title { font-size: 19px; }
+  .agenda { display: none; }
+  .step { top: 60px; font-size: 14px; padding: 10px 14px; white-space: normal; width: max-content; max-width: calc(100% - 24px); text-align: left; }
+
+  /* программа и профессии: прокрутка страницы, фильтры — горизонтальной лентой */
+  .page { padding: 14px var(--gutter) 20px; gap: 12px; }
+  .h2 { font-size: 26px; }
+  .lead { font-size: 13px; }
+  .chips { flex-wrap: nowrap; overflow-x: auto; margin: 0 calc(-1 * var(--gutter)); padding: 2px var(--gutter); scrollbar-width: none; width: calc(100% + 2 * var(--gutter)); }
+  .chips::-webkit-scrollbar { display: none; }
+  .chips .chip, .chips .chip--track { flex: none; min-height: 44px; font-size: 13px; padding: 0 14px; }
+  .slot { grid-template-columns: 58px minmax(0, 1fr); gap: 10px; padding: 10px 8px 10px 16px; }
+  .slot__time { font-size: 18px; }
+  .slot__title { white-space: normal; font-size: 15px; }
+  .slot__meta { white-space: normal; flex-wrap: wrap; }
+  .slot__place { grid-column: 2; flex-wrap: wrap; }
+  .btn-map { min-height: 40px; font-size: 13px; padding: 0 12px; }
+  .cards { grid-auto-rows: 290px; gap: 10px; }
+  .card__face { padding: 12px; }
+  .card__icon { width: 40px; height: 40px; margin: 8px 0; }
+  .card__name { font-size: 16px; }
+  .card__back .card__name { font-size: 14px; }
+  .card__desc { font-size: 12px; line-height: 1.35; }
+  .card__hint { font-size: 11px; }
+  .salary b { font-size: 21px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -556,7 +608,7 @@ const plan = (() => {
   const W = () => box.clientWidth;
   const availW = () => Math.max(200, W() - sbW());
   const H = () => Math.max(200, box.clientHeight - sbH());
-  const top = () => (portrait() ? 104 : 64); // место под переключатель этажей и легенду
+  const top = () => ($('#planTop').offsetHeight || 44) + 20; // место под переключатель этажей и легенду
 
   function apply(anim) {
     world.classList.toggle('is-anim', !!anim);
