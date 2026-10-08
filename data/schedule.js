@@ -1,7 +1,7 @@
 /* Программа форума. Файл записывает админка (admin.html) — вручную лучше не править. */
 window.FORUM_SCHEDULE = {
   "date": "2026-10-23",
-  "updated": "2026-10-08T08:42:15.131Z",
+  "updated": "2026-10-08T10:39:09.800Z",
   "tracks": [
     {"id":"t1","name":"Созидая Общество","color":"#f31ba4"},
     {"id":"t2","name":"Созидая Культуру","color":"#ced123"},
@@ -11,7 +11,12 @@ window.FORUM_SCHEDULE = {
     {"id":"t6","name":"Общие события","color":"#000000"}
   ],
   "rooms": {
-    "r8": {"sub":"Спикеров","hatched":true}
+    "hall1": {"hatched":true},
+    "r8": {"sub":"Спикеров"},
+    "cab": {"hatched":true},
+    "std": {"hatched":true},
+    "pod": {"hatched":true},
+    "chr": {"hatched":true}
   },
   "items": [
     {"start":"09:00","end":"10:00","kind":"Общее","title":"Регистрация участников","speaker":"","room":"","place":"ГастроЛобби \"АТС\"","track":"all"},
