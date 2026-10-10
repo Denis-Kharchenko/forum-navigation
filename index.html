@@ -166,7 +166,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 .agenda time { font-family: var(--f-display); font-weight: 600; color: var(--blue); font-size: 15px; font-variant-numeric: tabular-nums; }
 .agenda b { display: block; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 .agenda small { color: var(--ink-2); }
-.agenda .is-now time::after { content: "сейчас"; display: block; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--white); background: var(--red); padding: 0 4px; width: max-content; }
+.agenda .is-now time::after { content: "сейчас"; display: block; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--white); background: var(--red); padding: 0 4px; width: max-content; }
 .detail__hint .ico { width: 16px; height: 16px; }
 
 /* маршрут */
@@ -246,17 +246,17 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 .btn-map:active { transform: scale(.97); background: var(--blue-deep); }
 .btn-map .ico { width: 16px; height: 16px; }
 .slot { box-shadow: inset 6px 0 0 var(--c, var(--blue)); padding-left: 22px; }
-.slot.is-common { --c: #9a9aa5; }
-.slot__time { color: var(--c, var(--blue)); }
-.slot .kind { color: var(--c, var(--blue)); background: var(--blue-soft); background: color-mix(in srgb, var(--c, var(--blue)) 12%, white); }
+.slot.is-common { --c: #9a9aa5; --ct: #63636e; }
+.slot__time { color: var(--ct, var(--c, var(--blue))); }
+.slot .kind { color: var(--ct, var(--c, var(--blue))); background: var(--blue-soft); background: color-mix(in srgb, var(--c, var(--blue)) 12%, white); }
 .kind--all { color: var(--ink-2) !important; }
 .slot.is-now { background: var(--blue-soft); background: color-mix(in srgb, var(--c, var(--blue)) 9%, white); }
 /* вкладки треков */
-.chips .chip--track { border-color: var(--c); color: var(--c); min-height: 48px; padding: 0 18px; font-size: 15px; transition: background .15s, color .15s, transform .12s; }
+.chips .chip--track { border-color: var(--c); color: var(--ct, var(--c)); min-height: 48px; padding: 0 18px; font-size: 15px; transition: background .15s, color .15s, transform .12s; }
 .chips .chip--track:active { transform: scale(.97); }
-.chips .chip--track[aria-selected="true"] { background: var(--c); color: var(--white); }
+.chips .chip--track[aria-selected="true"] { background: var(--cb, var(--c)); border-color: var(--cb, var(--c)); color: var(--cf, var(--white)); }
 .timeline { border-top-color: var(--c, var(--blue)); transition: border-color .2s; }
-.slot.is-now .slot__time::after { content: "Сейчас"; display: block; margin-top: 4px; font-size: 10px; letter-spacing: .15em; color: var(--white); background: var(--red); padding: 1px 6px; width: max-content; }
+.slot.is-now .slot__time::after { content: "Сейчас"; display: block; margin-top: 4px; font-size: 12px; letter-spacing: .15em; color: var(--white); background: var(--red); padding: 1px 6px; width: max-content; }
 .slot.is-past { opacity: .45; }
 .pager { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .pager[hidden] { display: none; }
@@ -384,13 +384,15 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
   .chips { flex-wrap: nowrap; overflow-x: auto; margin: 0 calc(-1 * var(--gutter)); padding: 2px var(--gutter); scrollbar-width: none; width: calc(100% + 2 * var(--gutter)); gap: 6px; }
   .chips::-webkit-scrollbar { display: none; }
   .chips .chip, .chips .chip--track { flex: none; min-height: 48px; font-size: 16px; padding: 0 18px; }
+  #chips { flex-wrap: wrap; overflow: visible; margin: 0; padding: 0; width: 100%; }
+  #chips .chip { min-height: 44px; font-size: 15px; padding: 0 14px; }
 
   /* программа: все лекции трека на одном экране — строки ужимаются под их количество */
   #view-program .eyebrow, #view-program .lead { display: none; }
   #view-program .h2 { font-size: 22px; }
   #view-program .page { gap: 8px; padding-top: 10px; padding-bottom: 8px; }
-  #progChips { display: grid; grid-template-columns: repeat(auto-fit, minmax(62px, 1fr)); gap: 4px; overflow: visible; margin: 0; padding: 0; width: 100%; }
-  #progChips .chip--track { min-height: 38px; padding: 0 4px; font-size: 13px; letter-spacing: .02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #progChips { display: grid; grid-template-columns: repeat(auto-fit, minmax(104px, 1fr)); gap: 4px; overflow: visible; margin: 0; padding: 0; width: 100%; }
+  #progChips .chip--track { min-height: 44px; padding: 3px 6px; font-size: 13px; line-height: 1.1; letter-spacing: .02em; white-space: normal; text-wrap: balance; }
   .slot { grid-template-columns: 48px minmax(0, 1fr) auto; gap: 8px; padding: 0 6px 0 12px; align-items: center; box-shadow: inset 4px 0 0 var(--c, var(--blue)); }
   .slot__time { font-size: 16px; }
   .slot__time small { font-size: .65em; margin-top: 1px; }
@@ -414,7 +416,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
   .card__front::after { right: 22px; width: 10px; height: 56px; }
   .card__num { font-size: 13px; }
   .card__icon { width: 48px; height: 48px; margin: 10px 0 12px; }
-  .card__name { font-size: clamp(15px, 4.4vw, 18px); overflow-wrap: anywhere; }
+  .card__name { font-size: clamp(15px, 4.4vw, 18px); overflow-wrap: break-word; }
   .card__sphere { font-size: 12px; }
   .card__hint { font-size: 12px; }
   .card__hint .ico { width: 18px; height: 18px; }
@@ -626,15 +628,15 @@ const PROFESSIONS = [
   { name: 'Промпт-инженер', sphere: 'IT', icon: 'p-chat', salary: 150000, skills: ['Нейросети', 'Тексты', 'Логика'], desc: 'Составляет запросы к нейросетям так, чтобы они точно решали задачи бизнеса: от текстов и аналитики до автоматизации поддержки.' },
   { name: 'ML-инженер', sphere: 'IT', icon: 'p-cpu', salary: 260000, skills: ['Python', 'Математика', 'Данные'], desc: 'Обучает и внедряет модели машинного обучения: рекомендации, распознавание изображений, прогнозы спроса.' },
   { name: 'Аналитик данных', sphere: 'IT', icon: 'p-chart', salary: 160000, skills: ['SQL', 'Статистика', 'BI'], desc: 'Находит в больших массивах данных закономерности и превращает их в понятные решения для компании.' },
-  { name: 'Специалист по кибербезопасности', sphere: 'IT', icon: 'p-shield', salary: 190000, skills: ['Сети', 'Защита', 'Аудит'], desc: 'Защищает информационные системы от атак, ищет уязвимости и расследует инциденты.' },
+  { name: 'Специалист по кибер­безопасности', sphere: 'IT', icon: 'p-shield', salary: 190000, skills: ['Сети', 'Защита', 'Аудит'], desc: 'Защищает информационные системы от атак, ищет уязвимости и расследует инциденты.' },
   { name: 'Оператор и инженер БПЛА', sphere: 'Промышленность', icon: 'p-drone', salary: 120000, skills: ['Пилотирование', 'Электроника'], desc: 'Управляет беспилотниками и обслуживает их: мониторинг строек, сельхозугодий, линий электропередачи, доставка.' },
-  { name: 'Инженер-робототехник', sphere: 'Промышленность', icon: 'p-bot', salary: 150000, skills: ['Механика', 'Код', 'Сенсоры'], desc: 'Проектирует, программирует и настраивает роботов для заводов, складов и медицины.' },
-  { name: 'Инженер цифровых двойников', sphere: 'Промышленность', icon: 'p-layers', salary: 170000, skills: ['3D-модели', 'IoT', 'Симуляции'], desc: 'Создаёт виртуальные копии заводов, зданий и оборудования, чтобы тестировать изменения без риска для реального объекта.' },
+  { name: 'Инженер-робото­техник', sphere: 'Промышленность', icon: 'p-bot', salary: 150000, skills: ['Механика', 'Код', 'Сенсоры'], desc: 'Проектирует, программирует и настраивает роботов для заводов, складов и медицины.' },
+  { name: 'Инженер цифровых двой­ников', sphere: 'Промышленность', icon: 'p-layers', salary: 170000, skills: ['3D-модели', 'IoT', 'Симуляции'], desc: 'Создаёт виртуальные копии заводов, зданий и оборудования, чтобы тестировать изменения без риска для реального объекта.' },
   { name: 'Разработчик VR/AR', sphere: 'IT', icon: 'p-vr', salary: 180000, skills: ['Unity', '3D', 'UX'], desc: 'Создаёт приложения дополненной и виртуальной реальности: тренажёры, обучение, экскурсии, игры.' },
   { name: 'Биоинформатик', sphere: 'Наука', icon: 'p-dna', salary: 160000, skills: ['Биология', 'Python'], desc: 'Анализирует генетические данные с помощью программирования — помогает создавать лекарства и персональную медицину.' },
   { name: 'ESG-менеджер', sphere: 'Город и люди', icon: 'p-leaf', salary: 150000, skills: ['Экология', 'Стратегия'], desc: 'Отвечает за экологичность и социальную ответственность компании: снижение выбросов, переработку, проекты для сотрудников.' },
   { name: 'Урбанист', sphere: 'Город и люди', icon: 'p-city', salary: 120000, skills: ['Городская среда', 'Проекты'], desc: 'Проектирует комфортную городскую среду: общественные пространства, транспорт, «умные» сервисы для жителей.' },
-  { name: 'Менеджер по благополучию сотрудников', sphere: 'Город и люди', icon: 'p-heart', salary: 130000, skills: ['HR', 'Психология'], desc: 'Заботится о здоровье, финансовой грамотности и развитии сотрудников — чтобы людям хотелось работать и расти.' },
+  { name: 'Менеджер по благо­получию сотрудников', sphere: 'Город и люди', icon: 'p-heart', salary: 130000, skills: ['HR', 'Психология'], desc: 'Заботится о здоровье, финансовой грамотности и развитии сотрудников — чтобы людям хотелось работать и расти.' },
 ];
 
 // маршрут начинается от стойки; точка стойки поворачивается вместе с этажом
@@ -989,15 +991,19 @@ const trackColor = id => TRACKS.find(t => t.id === id)?.color || '#8a8a95';
 
 const prog = { track: TRACKS[0].id, page: 0, perPage: 6 };
 $('#progChips').innerHTML = TRACKS.map((t, i) =>
-  `<button type="button" class="chip chip--track" role="tab" style="--c:${esc(t.color)}" aria-selected="${i === 0}" data-track="${esc(t.id)}">${esc(t.name)}</button>`).join('');
+  `<button type="button" class="chip chip--track" role="tab" style="${esc(trackVars(t.color))}" aria-selected="${i === 0}" data-track="${esc(t.id)}">${esc(t.name)}</button>`).join('');
 function setTrack(id) {
   prog.track = id; prog.page = -1;
   $$('#progChips .chip').forEach(x => x.setAttribute('aria-selected', String(x.dataset.track === id)));
-  $('#timeline').style.setProperty('--c', trackColor(id));
+  setTimelineColor(id);
   renderProgram();
 }
 $$('#progChips .chip').forEach(ch => ch.addEventListener('click', () => setTrack(ch.dataset.track)));
-$('#timeline').style.setProperty('--c', trackColor(prog.track));
+function setTimelineColor(id) {
+  const el = $('#timeline'), c = trackColor(id);
+  el.style.setProperty('--c', c); el.style.setProperty('--ct', trackInk(c));
+}
+setTimelineColor(prog.track);
 
 function slotHTML(it, st) {
   const place = placeOf(it);
@@ -1015,6 +1021,7 @@ function slotHTML(it, st) {
   </li>`;
 }
 
+const MAX_ROW = 84;   // телефон: высота строки, если лекций мало
 function renderProgram() {
   const list = $('#timeline'), st = nowState();
   const items = ITEMS.filter(it => trackOf(it) === ALL || trackOf(it) === prog.track);
@@ -1022,10 +1029,10 @@ function renderProgram() {
   // Сколько строк помещается без прокрутки — меряем по одной отрисованной строке
   // На телефоне — все лекции трека на одном экране: строки делят высоту поровну
   const fitAll = matchMedia('(max-width: 600px)').matches;
-  list.style.gridTemplateRows = fitAll && items.length ? `repeat(${items.length}, minmax(0, 1fr))` : '';
+  list.style.gridTemplateRows = fitAll && items.length ? `repeat(${items.length}, minmax(0, ${MAX_ROW}px))` : '';
   if (fitAll) {
     prog.perPage = Math.max(1, items.length);
-    const rowH = list.clientHeight / Math.max(1, items.length);
+    const rowH = Math.min(MAX_ROW, list.clientHeight / Math.max(1, items.length));
     list.classList.toggle('is-dense', rowH < 58);
     list.classList.toggle('is-tiny', rowH < 40);
   } else if (items.length) {
@@ -1108,7 +1115,11 @@ function resetKiosk() {
   resetCards();
   prog.track = TRACKS[0].id;
   $$('#progChips .chip').forEach((x, i) => x.setAttribute('aria-selected', String(i === 0)));
-  $('#timeline').style.setProperty('--c', trackColor(prog.track));
+  function setTimelineColor(id) {
+  const el = $('#timeline'), c = trackColor(id);
+  el.style.setProperty('--c', c); el.style.setProperty('--ct', trackInk(c));
+}
+setTimelineColor(prog.track);
   renderFloor(KIOSK.floor);
   showView('nav');
   setSidebar(true);

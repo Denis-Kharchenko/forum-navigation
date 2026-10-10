@@ -41,7 +41,7 @@ button { cursor: pointer; }
 .btn {
   display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 0 16px; border: 2px solid var(--blue);
   font-family: var(--f-display); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; font-size: 14px;
-  background: var(--white); color: var(--blue); transition: background .15s, color .15s;
+  background: var(--white); color: var(--blue); text-decoration: none; transition: background .15s, color .15s;
 }
 .btn:hover { background: var(--blue-soft); }
 .btn--primary { background: var(--blue); color: var(--white); clip-path: var(--chamfer); }
@@ -90,10 +90,26 @@ details li { margin: 4px 0; }
 .track-edit input[type=text] { width: 100%; min-width: 0; min-height: 42px; padding: 0 10px; border: 2px solid var(--line); }
 .track-edit input[type=text]:focus { border-color: var(--blue); outline: none; }
 .track-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
-.ttab { min-height: 40px; padding: 0 14px; border: 2px solid var(--c, var(--ink-2)); color: var(--c, var(--ink-2)); background: var(--white); font-family: var(--f-display); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; font-size: 14px; }
-.ttab[aria-selected="true"] { background: var(--c, var(--ink-2)); color: var(--white); }
+.ttab { min-height: 40px; padding: 0 14px; border: 2px solid var(--c, var(--ink-2)); color: var(--ct, var(--c, var(--ink-2))); background: var(--white); font-family: var(--f-display); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; font-size: 14px; }
+.ttab[aria-selected="true"] { background: var(--cb, var(--c, var(--ink-2))); border-color: var(--cb, var(--c, var(--ink-2))); color: var(--cf, var(--white)); }
 .ttab small { opacity: .75; margin-left: 4px; }
 tbody tr td:first-child { box-shadow: inset 5px 0 0 var(--c, #9a9aa5); padding-left: 13px; }
+td.num { font-family: var(--f-display); font-weight: 600; color: var(--ink-2); font-size: 15px; padding-top: 14px; font-variant-numeric: tabular-nums; }
+.col-num { width: 46px; }
+.row-acts { display: flex; gap: 2px; }
+.dup { width: 40px; height: 40px; border: 0; background: none; color: var(--ink-2); display: grid; place-items: center; }
+.dup:hover { color: var(--blue); background: var(--blue-soft); }
+tr.is-new td { animation: rowIn 1.2s ease-out; }
+@keyframes rowIn { from { background: var(--blue-soft); } }
+@media (prefers-reduced-motion: reduce) { tr.is-new td { animation: none; } }
+.meta input[type=search] { min-height: 42px; padding: 0 10px; border: 2px solid var(--line); background: var(--white); width: 260px; }
+.meta input[type=search]:focus { border-color: var(--blue); outline: none; }
+.issues button { all: unset; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.issues button:hover { color: var(--ink); }
+.issues button:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+.draft { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 0 0 16px; padding: 10px 16px; background: #fff3d6; color: #6b4600; font-weight: 600; font-size: 14px; }
+.draft .btn { min-height: 36px; }
+kbd { font-family: var(--f-body); font-size: 12px; padding: 1px 6px; border: 1px solid #c9cdd9; border-bottom-width: 2px; background: var(--white); }
 .col-track { width: 190px; }
 .all-check { display: flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 12.5px; font-weight: 600; color: var(--ink-2); cursor: pointer; line-height: 1.2; }
 .all-check input { width: 18px; height: 18px; min-height: 0; margin: 0; flex: none; }
@@ -131,7 +147,7 @@ td select:disabled { background: #f1f1ee; color: var(--ink-2); }
 @media (max-width: 1100px) { .rooms-edit { grid-template-columns: 1fr; } }
 
 .table-wrap { background: var(--white); border-top: 4px solid var(--blue); overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; min-width: 1260px; }
+table { width: 100%; border-collapse: collapse; min-width: 1140px; }
 th { text-align: left; font-family: var(--f-display); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; font-size: 12px; color: var(--ink-2); padding: 10px 8px; border-bottom: 2px solid var(--blue-soft); background: var(--white); }
 td { padding: 6px 8px; border-bottom: 1px solid var(--blue-soft); vertical-align: top; }
 tr.is-hidden { display: none; }
@@ -143,7 +159,7 @@ td.bad input, td.bad select { border-color: var(--red); background: var(--red-so
 .col-time { width: 104px; }
 .col-kind { width: 170px; }
 .col-place { width: 240px; }
-.col-del { width: 48px; }
+.col-del { width: 90px; }
 .del { width: 40px; height: 40px; border: 0; background: none; color: var(--ink-2); display: grid; place-items: center; }
 .del:hover { color: var(--red); background: var(--red-soft); }
 .ico { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
@@ -160,9 +176,10 @@ td.bad input, td.bad select { border-color: var(--red); background: var(--red-so
     <p class="brand">Программа форума <small>админка</small></p>
     <div class="top__actions" id="actions" hidden>
       <span class="status" id="status"></span>
+      <a class="btn btn--ghost" href="index.html#program" target="_blank" rel="noopener" title="Опубликованная версия — изменения появляются через 1–2 минуты после сохранения">Открыть стойку</a>
       <button type="button" class="btn" id="btnDownload" title="Скачать файл программы на компьютер">Скачать файл</button>
       <button type="button" class="btn" id="btnReload">Загрузить заново</button>
-      <button type="button" class="btn btn--primary" id="btnSave">Сохранить</button>
+      <button type="button" class="btn btn--primary" id="btnSave" title="Ctrl+S">Сохранить</button>
       <button type="button" class="btn btn--ghost" id="btnLogout">Выйти</button>
     </div>
   </div>
@@ -198,6 +215,11 @@ td.bad input, td.bad select { border-color: var(--red); background: var(--red-so
 
 <!-- ===== Редактор ===== -->
 <main class="wrap" id="editor" hidden>
+  <div class="draft" id="draft" hidden role="status">
+    <span id="draftText"></span>
+    <button type="button" class="btn btn--primary" id="btnDraftRestore">Восстановить</button>
+    <button type="button" class="btn btn--ghost" id="btnDraftDrop">Удалить черновик</button>
+  </div>
   <div class="sections" role="tablist" aria-label="Разделы админки">
     <button type="button" class="stab" role="tab" data-sec="program" aria-selected="true">Программа</button>
     <button type="button" class="stab" role="tab" data-sec="rooms" aria-selected="false">Помещения</button>
@@ -225,6 +247,10 @@ td.bad input, td.bad select { border-color: var(--red); background: var(--red-so
       <label for="filter">Показать</label>
       <select id="filter"></select>
     </div>
+    <div class="field">
+      <label for="search">Поиск</label>
+      <input type="search" id="search" placeholder="Название или спикер" autocomplete="off">
+    </div>
     <span class="counter" id="counter"></span>
   </div>
 
@@ -243,6 +269,7 @@ td.bad input, td.bad select { border-color: var(--red); background: var(--red-so
     <table>
       <thead>
         <tr>
+          <th class="col-num">№</th>
           <th class="col-time">Начало</th>
           <th class="col-time">Конец</th>
           <th class="col-track">Трек</th>
@@ -258,12 +285,13 @@ td.bad input, td.bad select { border-color: var(--red); background: var(--red-so
     <div class="empty" id="empty" hidden>Пока ни одной записи. Нажмите «Добавить лекцию».</div>
   </div>
   <button type="button" class="btn add-row" id="btnAdd">+ Добавить лекцию</button>
-  <p class="hint">Записи автоматически сортируются по времени при сохранении. Галочка «Применить ко всем трекам» показывает запись во всех треках — для открытия, обеда, нетворкинга. Если одно и то же место занято двумя лекциями одновременно, админка предупредит.</p>
+  <p class="hint">Сохранить — <kbd>Ctrl</kbd>+<kbd>S</kbd>. Пока вы работаете, черновик хранится в этом браузере: если вкладка закроется или пропадёт связь, при следующем входе админка предложит его восстановить. Кнопка «Копировать» рядом с записью добавляет такую же лекцию сразу после неё. Записи автоматически сортируются по времени при сохранении. Галочка «Применить ко всем трекам» показывает запись во всех треках — для открытия, обеда, нетворкинга. Если одно и то же место занято двумя лекциями одновременно, админка предупредит.</p>
   </section>
 </main>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-undo" viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="1"/><path d="M4 16V4a1 1 0 0 1 1-1h11"/></symbol>
   <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></symbol>
 </svg>
 
@@ -317,8 +345,39 @@ function setStatus(text, kind = 'ok') {
 }
 function setDirty(v) {
   dirty = v;
-  if (v) setStatus('Есть несохранённые изменения', 'warn');
+  if (v) { setStatus('Есть несохранённые изменения', 'warn'); saveDraft(); }
 }
+
+/* ---------- Черновик: несохранённые правки живут в этом браузере, пока их не сохранят ---------- */
+const DRAFT_KEY = 'forum-admin-draft';
+let draftTimer = null;
+function saveDraft() {
+  clearTimeout(draftTimer);
+  draftTimer = setTimeout(() => { try { localStorage.setItem(DRAFT_KEY, JSON.stringify({ at: Date.now(), data: readAll() })); } catch {} }, 800);
+}
+function clearDraft() {
+  clearTimeout(draftTimer);
+  try { localStorage.removeItem(DRAFT_KEY); } catch {}
+  $('#draft').hidden = true;
+}
+let pendingDraft = null;
+function offerDraft() {
+  let d = null;
+  try { d = JSON.parse(localStorage.getItem(DRAFT_KEY)); } catch {}
+  if (!d || !d.data) return;
+  const same = (a, b) => JSON.stringify([a.date, a.tracks, a.rooms, a.items]) === JSON.stringify([b.date, b.tracks, b.rooms, b.items]);
+  if (same(d.data, readAll())) { clearDraft(); return; }
+  pendingDraft = d.data;
+  const when = new Date(d.at).toLocaleString('ru-RU', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
+  $('#draftText').textContent = `Есть несохранённый черновик от ${when}. Восстановить его?`;
+  $('#draft').hidden = false;
+}
+$('#btnDraftRestore').addEventListener('click', () => {
+  if (!pendingDraft) return;
+  fill(pendingDraft); setDirty(true); $('#draft').hidden = true;
+  setStatus('Черновик восстановлен — не забудьте сохранить', 'warn');
+});
+$('#btnDraftDrop').addEventListener('click', () => { if (confirm('Удалить черновик? Эти правки пропадут.')) clearDraft(); });
 window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
 
 /* ---------- Кодирование файла ---------- */
@@ -417,6 +476,7 @@ function trackCell(it) {
 function rowHTML(it = {}) {
   const tr = it.track || ALL;
   return `<tr style="--c:${tr === ALL ? '#9a9aa5' : trackColor(tr)}">
+    <td class="num"></td>
     <td><input type="time" data-f="start" value="${esc(it.start)}" required></td>
     <td><input type="time" data-f="end" value="${esc(it.end)}"></td>
     <td>${trackCell(it)}</td>
@@ -424,7 +484,10 @@ function rowHTML(it = {}) {
     <td><input data-f="title" value="${esc(it.title)}" placeholder="Название лекции" required></td>
     <td><input data-f="speaker" value="${esc(it.speaker)}" placeholder="Имя, должность"></td>
     <td>${placeSelect(it)}</td>
-    <td><button type="button" class="del" aria-label="Удалить запись"><svg class="ico"><use href="#i-trash"/></svg></button></td>
+    <td><div class="row-acts">
+      <button type="button" class="dup" aria-label="Копировать запись" title="Копировать: такая же запись сразу после этой"><svg class="ico"><use href="#i-copy"/></svg></button>
+      <button type="button" class="del" aria-label="Удалить запись" title="Удалить"><svg class="ico"><use href="#i-trash"/></svg></button>
+    </div></td>
   </tr>`;
 }
 function renderTracks() {
@@ -447,7 +510,7 @@ function refreshTrackCells() {
 function renderTabs() {
   const count = id => $$('#rows tr').filter(tr => readRow(tr).track === id).length;
   $('#trackTabs').innerHTML = [{ id: ALL, name: 'Все треки' }, ...tracks].map(t =>
-    `<button type="button" class="ttab" role="tab" style="${t.color ? '--c:' + esc(t.color) : ''}" aria-selected="${trackTab === t.id}" data-tab="${t.id}">${esc(t.name)}<small>${t.id === ALL ? $$('#rows tr').length : count(t.id)}</small></button>`).join('');
+    `<button type="button" class="ttab" role="tab" style="${t.color ? esc(trackVars(t.color)) : ''}" aria-selected="${trackTab === t.id}" data-tab="${t.id}">${esc(t.name)}<small>${t.id === ALL ? $$('#rows tr').length : count(t.id)}</small></button>`).join('');
 }
 function fill(data) {
   roomsOv = JSON.parse(JSON.stringify(data.rooms || {}));
@@ -474,15 +537,17 @@ const readAll = () => ({ date: $('#evDate').value, tracks: tracks.map(t => ({ ..
 /* ---------- Проверки ---------- */
 function validate() {
   const rows = $$('#rows tr'), items = rows.map(readRow), issues = [];
-  rows.forEach(tr => tr.querySelectorAll('td').forEach(td => td.classList.remove('bad')));
+  rows.forEach((tr, i) => { tr.querySelectorAll('td').forEach(td => td.classList.remove('bad')); tr.cells[0].textContent = i + 1; });
   const mark = (i, f) => rows[i].querySelector(`[data-f="${f}"]`).closest('td').classList.add('bad');
+  // замечание о строке — ссылка: по нажатию админка показывает строку и ставит курсор в нужное поле
+  const at = (i, f, text) => issues.push({ text, row: i, f });
   items.forEach((it, i) => {
     const n = `Строка ${i + 1}`;
-    if (!it.start) { mark(i, 'start'); issues.push(`${n}: не указано время начала`); }
-    if (!it.title) { mark(i, 'title'); issues.push(`${n}: не указано название`); }
-    if (it.start && it.end && toMin(it.end) <= toMin(it.start)) { mark(i, 'end'); issues.push(`${n}: конец раньше начала`); }
-    if (!it.room && !it.place) { mark(i, 'room'); issues.push(`${n}: не выбрано место`); }
-    if (it.room && roomById(it.room) && !roomById(it.room).list) { mark(i, 'room'); issues.push(`${n}: «${placeName(it)}» заштриховано на плане — на стойке не будет маршрута`); }
+    if (!it.start) { mark(i, 'start'); at(i, 'start', `${n}: не указано время начала`); }
+    if (!it.title) { mark(i, 'title'); at(i, 'title', `${n}: не указано название`); }
+    if (it.start && it.end && toMin(it.end) <= toMin(it.start)) { mark(i, 'end'); at(i, 'end', `${n}: конец раньше начала`); }
+    if (!it.room && !it.place) { mark(i, 'room'); at(i, 'room', `${n}: не выбрано место`); }
+    if (it.room && roomById(it.room) && !roomById(it.room).list) { mark(i, 'room'); at(i, 'room', `${n}: «${placeName(it)}» заштриховано на плане — на стойке не будет маршрута`); }
   });
   // Пересечения в одном зале
   items.forEach((a, i) => items.forEach((b, j) => {
@@ -490,14 +555,30 @@ function validate() {
     const a1 = toMin(a.start), a2 = a.end ? toMin(a.end) : a1 + 1, b1 = toMin(b.start), b2 = b.end ? toMin(b.end) : b1 + 1;
     if (a1 < b2 && b1 < a2) {
       mark(i, 'room'); mark(j, 'room');
-      issues.push(`Строки ${i + 1} и ${j + 1}: «${placeName(a)}» занят в одно время`);
+      at(j, 'room', `Строки ${i + 1} и ${j + 1}: «${placeName(a)}» занят в одно время`);
     }
   }));
-  tracks.forEach((t, i) => { if (!t.name.trim()) issues.push(`Трек ${i + 1}: не указано название`); });
-  $('#issues').innerHTML = issues.map(t => `<li>${esc(t)}</li>`).join('');
+  tracks.forEach((t, i) => { if (!t.name.trim()) issues.push({ text: `Трек ${i + 1}: не указано название`, track: i }); });
+  $('#issues').innerHTML = issues.map((t, k) => `<li><button type="button" data-issue="${k}">${esc(t.text)}</button></li>`).join('');
+  lastIssues = issues;
   $('#issues').hidden = !issues.length;
   return issues;
 }
+
+let lastIssues = [];
+$('#issues').addEventListener('click', e => {
+  const b = e.target.closest('[data-issue]');
+  if (!b) return;
+  const it = lastIssues[+b.dataset.issue];
+  if (it.track !== undefined) { $$('#tracksEdit input[type=text]')[it.track]?.focus(); return; }
+  const tr = $$('#rows tr')[it.row];
+  if (!tr) return;
+  if (tr.classList.contains('is-hidden')) {   // строка скрыта фильтром — сбрасываем фильтры
+    trackTab = ALL; $('#filter').value = 'all'; $('#search').value = ''; applyFilter();
+  }
+  tr.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  tr.querySelector(`[data-f="${it.f}"]`)?.focus({ preventScroll: true });
+});
 
 function refresh() {
   const n = $$('#rows tr').length;
@@ -512,12 +593,13 @@ function refresh() {
   validate();
 }
 function applyFilter() {
-  const f = $('#filter').value;
+  const f = $('#filter').value, q = $('#search').value.trim().toLowerCase();
   $$('#rows tr').forEach(tr => {
     const it = readRow(tr);
     const byPlace = f !== 'all' && (f === OTHER ? !!it.room : it.room !== f);
     const byTrack = trackTab !== ALL && it.track !== ALL && it.track !== trackTab;
-    tr.classList.toggle('is-hidden', byPlace || byTrack);
+    const byText = q && !(it.title + ' ' + it.speaker).toLowerCase().includes(q);
+    tr.classList.toggle('is-hidden', byPlace || byTrack || byText);
   });
   renderTabs();
 }
@@ -545,6 +627,20 @@ $('#rows').addEventListener('change', e => {
   setDirty(true); validate();
 });
 $('#rows').addEventListener('click', e => {
+  const d = e.target.closest('.dup');
+  if (d) {
+    // копия встаёт сразу после записи и начинается, когда та заканчивается (той же длительности)
+    const tr = d.closest('tr'), it = readRow(tr);
+    const pad = n => String(n).padStart(2, '0'), fmt = m => `${pad(Math.floor(m / 60) % 24)}:${pad(m % 60)}`;
+    if (it.start && it.end) { const len = toMin(it.end) - toMin(it.start); it.start = it.end; it.end = len > 0 ? fmt(toMin(it.end) + len) : ''; }
+    tr.insertAdjacentHTML('afterend', rowHTML(it));
+    const copy = tr.nextElementSibling;
+    copy.classList.add('is-new');
+    setDirty(true); refresh();
+    const title = copy.querySelector('[data-f="title"]');
+    title.focus(); title.select();
+    return;
+  }
   const b = e.target.closest('.del');
   if (!b) return;
   const tr = b.closest('tr'), title = readRow(tr).title || 'без названия';
@@ -604,6 +700,7 @@ $('#trackTabs').addEventListener('click', e => {
   applyFilter();
 });
 $('#filter').addEventListener('change', applyFilter);
+$('#search').addEventListener('input', applyFilter);
 
 /* ---------- Помещения ---------- */
 let roomFloor = FLOOR_IDS.find(f => !FLOORS[f].placeholder) || 1, roomSel = null;   // первый этаж с готовым планом
@@ -716,7 +813,7 @@ $('#btnSave').addEventListener('click', async () => {
       sha, branch: REPO.branch,
     });
     sha = res.content.sha;
-    setDirty(false);
+    setDirty(false); clearDraft();
     setStatus('Сохранено. На сайте появится через 1–2 минуты', 'ok');
   } catch (e) {
     setStatus(explain(e) + (e.status === 409 || e.status === 422 ? ' Скачайте свой файл, затем «Загрузить заново».' : ''), 'err');
@@ -730,12 +827,21 @@ $('#btnDownload').addEventListener('click', () => {
 });
 $('#btnReload').addEventListener('click', async () => {
   if (dirty && !confirm('Несохранённые изменения пропадут. Загрузить заново?')) return;
+  if (dirty) clearDraft();
   try { await loadRemote(); } catch (e) { setStatus(explain(e), 'err'); }
 });
 $('#btnLogout').addEventListener('click', () => {
   if (dirty && !confirm('Несохранённые изменения пропадут. Выйти?')) return;
   try { localStorage.removeItem(TOKEN_KEY); } catch {}
   dirty = false; location.reload();
+});
+
+// Ctrl+S — сохранить (без входа — скачать файл)
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.code === 'KeyS' && !$('#editor').hidden) {
+    e.preventDefault();
+    (mode === 'api' ? $('#btnSave') : $('#btnDownload')).click();
+  }
 });
 
 /* ---------- Вход ---------- */
@@ -752,6 +858,7 @@ async function login(t, remember) {
   try {
     openEditor('api');
     await loadRemote();
+    offerDraft();
     if (remember) try { localStorage.setItem(TOKEN_KEY, t); } catch {}
   } catch (e) {
     token = null;
@@ -768,6 +875,7 @@ $('#btnLocal').addEventListener('click', () => {
   openEditor('local');
   fill(window.FORUM_SCHEDULE || { date: '', items: [] });
   setStatus('Режим без входа: изменения можно только скачать файлом', 'warn');
+  offerDraft();
 });
 
 let saved = null;

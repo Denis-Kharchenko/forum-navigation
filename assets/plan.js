@@ -106,9 +106,9 @@ function drawLabel(g, r) {
   const cx = r.label ? r.label[0] : bx + bw / 2, cy = r.label ? r.label[1] : by + bh / 2;
   if (r.labelBox) [bw, bh] = r.labelBox;   // подпись рядом с узкой зоной — своя область для подбора размера
   const gray = (!EDITABLE.includes(r.type) && r.type !== 'zone') || r.type === 'service';
-  const ls = labelScale();
-  const tStyle = gray ? { cls: 't3', size: 16 * ls, k: 0.6 } : { cls: 't1', size: 30 * ls, k: 0.55 };
-  const sStyle = gray ? { cls: 't3', size: 14 * ls, k: 0.6 } : { cls: 't2', size: 20 * ls, k: 0.6 };
+  const ls = labelScale(), gs = ls > 1 ? ls * 1.4 : ls;   // серые подписи на телефоне — ещё крупнее, иначе не читаются
+  const tStyle = gray ? { cls: 't3', size: 16 * gs, k: 0.6 } : { cls: 't1', size: 30 * ls, k: 0.55 };
+  const sStyle = gray ? { cls: 't3', size: 14 * gs, k: 0.6 } : { cls: 't2', size: 20 * ls, k: 0.6 };
   const title = r.planTitle ?? r.title ?? '', sub = r.planSub ?? r.sub ?? '';
   if (!title) return;
   const variants = [[title], splitTwo(title)].filter(Boolean).map(tl => [
@@ -211,3 +211,25 @@ function renderPlan(world, f, { clickable = r => r.list, onSelect = () => {} } =
   });
   world.append(outside, strokes, fills, inside, over, labels);
 }
+
+/* Цвета треков выбирают организаторы — текст подстраиваем, чтобы он читался (контраст не ниже 4.5:1) */
+function hexRgb(hex) {
+  const m = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(String(hex || '').trim());
+  if (!m) return [138, 138, 149];
+  const h = m[1].length === 3 ? m[1].replace(/./g, c => c + c) : m[1];
+  return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16));
+}
+const luminance = rgb => rgb.map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; })
+  .reduce((s, v, i) => s + v * [0.2126, 0.7152, 0.0722][i], 0);
+const contrastRatio = (a, b) => { const x = luminance(a), y = luminance(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+const WHITE_RGB = [255, 255, 255], INK_RGB = [17, 17, 20];
+// цвет трека для текста на белом: тот же оттенок, затемнённый до читаемого
+function trackInk(hex) {
+  let rgb = hexRgb(hex);
+  for (let k = 0; k < 30 && contrastRatio(rgb, WHITE_RGB) < 4.5; k++) rgb = rgb.map(v => v * 0.92);
+  return '#' + rgb.map(v => Math.round(v).toString(16).padStart(2, '0')).join('');
+}
+// заливка выбранного трека: насыщенный цвет — затемняем под белый текст, светлый (жёлтый, голубой) — оставляем, текст тёмный
+const trackFill = hex => contrastRatio(hexRgb(hex), WHITE_RGB) >= 3 ? { bg: trackInk(hex), fg: '#fff' } : { bg: hex, fg: '#111114' };
+// CSS-переменные трека: --c (сам цвет), --ct (текст на белом), --cb / --cf (заливка выбранного и текст на ней)
+const trackVars = hex => { const f = trackFill(hex); return `--c:${hex};--ct:${trackInk(hex)};--cb:${f.bg};--cf:${f.fg}`; };
