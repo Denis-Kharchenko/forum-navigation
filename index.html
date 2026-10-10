@@ -274,34 +274,36 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 .chip { min-height: 52px; padding: 0 20px; border: 2px solid var(--blue); color: var(--blue); background: var(--white); font-family: var(--f-display); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; font-size: 17px; transition: background .15s, color .15s; }
 .chip[aria-pressed="true"] { background: var(--blue); color: var(--white); }
 .cards { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: clamp(8px, 1.2vh, 14px); }
-.card { perspective: 1400px; min-height: 0; animation: cardIn .35s var(--ease) both; animation-delay: calc(var(--i) * 35ms); }
+.card { container: card / size; perspective: 1400px; min-height: 0; animation: cardIn .35s var(--ease) both; animation-delay: calc(var(--i) * 35ms); }
 @keyframes cardIn { from { opacity: 0; transform: translateY(12px); } }
 .card[hidden] { display: none; }
 .card__inner { position: relative; width: 100%; height: 100%; display: block; text-align: left; transform-style: preserve-3d; transition: transform .6s var(--ease); }
 .card.is-flipped .card__inner { transform: rotateY(180deg); }
 .card__face {
   position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden;
-  padding: clamp(10px, 1.6vh, 18px); display: flex; flex-direction: column; overflow: hidden;
+  padding: clamp(10px, 5cqmin, 18px); display: flex; flex-direction: column; overflow: hidden;
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%);
 }
 .card__front { background: var(--white); border: 1px solid var(--line); }
 .card__front::after { content: ""; position: absolute; right: 24px; top: -14px; width: 10px; height: 60px; background: var(--red); transform: skewX(-20deg); }
-.card__num { font-family: var(--f-display); font-weight: 600; color: var(--blue); opacity: .6; font-size: 15px; letter-spacing: .1em; }
-.card__icon { width: clamp(40px, 5.5vh, 56px); height: clamp(40px, 5.5vh, 56px); display: grid; place-items: center; background: var(--blue-soft); color: var(--blue); margin: clamp(6px, 1.2vh, 14px) 0; }
+.card__num { font-family: var(--f-display); font-weight: 600; color: var(--blue); opacity: .6; font-size: clamp(12px, 4.6cqmin, 15px); letter-spacing: .1em; }
+.card__icon { width: clamp(36px, 17cqmin, 56px); height: clamp(36px, 17cqmin, 56px); display: grid; place-items: center; background: var(--blue-soft); color: var(--blue); margin: clamp(6px, 4cqmin, 14px) 0; }
 .card__icon .ico { width: 55%; height: 55%; stroke-width: 1.75; }
-.card__name { font-family: var(--f-display); font-weight: 700; text-transform: uppercase; font-size: clamp(19px, 2.5vh, 27px); line-height: 1.1; color: var(--ink); margin: 0 0 6px; }
-.card__sphere { font-size: 14px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: .08em; }
-.card__hint { margin-top: auto; display: flex; align-items: center; gap: 8px; color: var(--ink-2); font-size: 15px; font-weight: 600; }
+.card__name { font-family: var(--f-display); font-weight: 700; text-transform: uppercase; font-size: clamp(16px, 8cqmin, 27px); line-height: 1.1; color: var(--ink); margin: 0 0 6px; }
+.card__sphere { font-size: clamp(11px, 4.4cqmin, 14px); font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: .08em; }
+.card__hint { margin-top: auto; display: flex; align-items: center; gap: 8px; color: var(--ink-2); font-size: clamp(12px, 4.8cqmin, 15px); font-weight: 600; }
 .card__hint .ico { width: 20px; height: 20px; color: var(--red); }
 .card__back { background: var(--blue); color: var(--white); transform: rotateY(180deg); }
-.card__back .card__name { color: var(--white); font-size: clamp(17px, 2.2vh, 24px); margin-bottom: 8px; }
-.card__desc { font-size: clamp(14px, 1.75vh, 18px); line-height: 1.4; margin: 0 0 10px; }
-.card__skills { display: flex; flex-wrap: wrap; gap: 4px; }
-.card__skills span { font-size: 14px; font-weight: 700; padding: 3px 8px; background: rgba(255, 255, 255, .16); }
-.salary { margin-top: auto; padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, .3); }
-.salary small { display: block; font-size: 13px; text-transform: uppercase; letter-spacing: .12em; opacity: .85; font-weight: 700; }
+.card__back .card__name { color: var(--white); font-size: clamp(15px, 7.4cqmin, 24px); margin-bottom: clamp(4px, 2.4cqmin, 8px); flex: none; }
+.card__desc { font-size: clamp(12px, 5.6cqmin, 18px); line-height: 1.38; margin: 0 0 clamp(6px, 3cqmin, 10px); min-height: 0; overflow: hidden; }
+.card__skills { display: flex; flex-wrap: wrap; gap: 4px; flex: none; }
+/* широкая и низкая карточка — навыки прячем, чтобы описание и зарплата поместились целиком */
+@container card (min-aspect-ratio: 19 / 20) { .card__skills { display: none; } }
+.card__skills span { font-size: clamp(11px, 4.4cqmin, 14px); font-weight: 700; padding: 3px 8px; background: rgba(255, 255, 255, .16); }
+.salary { flex: none; margin-top: auto; padding-top: clamp(4px, 2.4cqmin, 8px); border-top: 1px solid rgba(255, 255, 255, .3); }
+.salary small { display: block; font-size: clamp(10px, 4cqmin, 13px); text-transform: uppercase; letter-spacing: .12em; opacity: .85; font-weight: 700; }
 .footnote { margin: 0; color: var(--ink-2); font-size: 15px; }
-.salary b { font-family: var(--f-display); font-weight: 700; font-size: clamp(24px, 3.2vh, 34px); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.salary b { font-family: var(--f-display); font-weight: 700; font-size: clamp(19px, 10cqmin, 34px); line-height: 1.1; font-variant-numeric: tabular-nums; }
 
 /* ===== Вертикальная стойка ===== */
 @media (orientation: portrait) {
