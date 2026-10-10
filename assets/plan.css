@@ -36,3 +36,7 @@
 .lbl--zone.is-active .t1, .lbl--zone.is-active .t2 { fill: #fff; }
 .lbl--zone.is-outside.is-active .t1, .lbl--zone.is-outside.is-active .t2 { fill: var(--zc); }
 .hall-edge { fill: none; stroke: var(--blue, #2450EC); stroke-width: 3; }
+
+/* Заглушка: план этажа ещё не готов */
+.ph-box { fill: #fff; stroke: var(--line, #b9c1d9); stroke-width: 3; stroke-dasharray: 14 10; }
+.ph-text { font-family: var(--f-display); font-weight: 700; text-transform: uppercase; font-size: 46px; fill: var(--ink-3, #7a7a85); text-anchor: middle; dominant-baseline: central; letter-spacing: .04em; }

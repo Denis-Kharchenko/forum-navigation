@@ -144,6 +144,13 @@ function drawLabel(g, r) {
 function renderPlan(world, f, { clickable = r => r.list, onSelect = () => {} } = {}) {
   world.innerHTML = '';
   const fl = FLOORS[f];
+  // План этажа ещё не готов — рамка с надписью
+  if (fl.placeholder) {
+    world.append(
+      svgEl('rect', { x: 20, y: 20, width: fl.w - 40, height: fl.h - 40, class: 'ph-box' }),
+      Object.assign(svgEl('text', { x: fl.w / 2, y: fl.h / 2, class: 'ph-text' }), { textContent: fl.placeholder }));
+    return;
+  }
   // Стены: обводка объединения корпусов (обводка снизу, заливка сверху — внутренние стыки скрываются)
   const strokes = svgEl('g'), fills = svgEl('g'), over = svgEl('g');
   (fl.masses || []).forEach(([x, y, w, h]) => {

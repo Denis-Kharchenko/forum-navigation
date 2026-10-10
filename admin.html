@@ -207,10 +207,7 @@ td.bad input, td.bad select { border-color: var(--red); background: var(--red-so
     <section class="panel">
       <h2>Помещения</h2>
       <p>Нажмите на помещение на плане или в списке, чтобы переименовать его. «Заштриховать» убирает помещение из навигации стойки: на плане оно заштриховано и без подписи. Чтобы подписать заштрихованное помещение, впишите ему название. Снимите галочку, чтобы вернуть.</p>
-      <div class="rfloors" role="group" aria-label="Этаж">
-        <button type="button" class="rfloor" data-floor="1" aria-pressed="true">1 этаж</button>
-        <button type="button" class="rfloor" data-floor="2" aria-pressed="false">2 этаж</button>
-      </div>
+      <div class="rfloors" id="rfloors" role="group" aria-label="Этаж"></div>
       <div class="rooms-edit">
         <div class="mini-plan"><svg id="adminPlan" preserveAspectRatio="xMidYMid meet" role="img" aria-label="План этажа"><g id="adminWorld"></g></svg></div>
         <div class="room-list" id="roomList"></div>
@@ -304,6 +301,8 @@ const toMin = t => { const [h, m] = String(t).split(':').map(Number); return h *
 let roomsOv = {};
 prepareRooms(roomsOv);
 const roomById = id => ROOMS.find(r => r.id === id);
+const FLOOR_IDS = Object.keys(FLOORS).map(Number);
+const floorName = f => FLOORS[f].label || `${f} этаж`;
 const roomLabel = r => r.title + (r.sub && r.type === 'hall' ? ' · ' + r.sub : '');
 // Места, которые можно выбрать: незаштрихованные помещения
 const places = () => ROOMS.filter(r => r.list).map(r => ({ id: r.id, floor: r.floor, name: roomLabel(r) }));
@@ -404,8 +403,7 @@ function placeSelect(it) {
   const isOther = !it.room && it.place;
   return `<select data-f="room">
       <option value=""${!it.room && !it.place ? ' selected' : ''}>— выберите —</option>
-      <optgroup label="1 этаж">${byFloor(1)}</optgroup>
-      <optgroup label="2 этаж">${byFloor(2)}</optgroup>
+      ${FLOOR_IDS.map(f => `<optgroup label="${esc(floorName(f))}">${byFloor(f)}</optgroup>`).join('')}
       <option value="${OTHER}"${isOther ? ' selected' : ''}>Другое место…</option>
     </select>
     <input class="other" data-f="place" placeholder="Например: Лобби" value="${esc(it.place)}"${isOther ? '' : ' hidden'}>`;
@@ -608,7 +606,7 @@ $('#trackTabs').addEventListener('click', e => {
 $('#filter').addEventListener('change', applyFilter);
 
 /* ---------- Помещения ---------- */
-let roomFloor = 1, roomSel = null;
+let roomFloor = FLOOR_IDS.find(f => !FLOORS[f].placeholder) || 1, roomSel = null;   // первый этаж с готовым планом
 // Отличия от исходных данных — только они попадают в файл
 function roomDiff(r) {
   const o = {};
@@ -694,6 +692,7 @@ $('#roomList').addEventListener('focusin', e => {
   const id = e.target.closest('.room-row')?.dataset.id;
   if (id && id !== roomSel) selectEditRoom(id, false);
 });
+$('#rfloors').innerHTML = FLOOR_IDS.map(f => `<button type="button" class="rfloor" data-floor="${f}" aria-pressed="${f === roomFloor}">${esc(floorName(f))}</button>`).join('');
 $$('.rfloor').forEach(b => b.addEventListener('click', () => { roomFloor = +b.dataset.floor; roomSel = null; renderRoomsEditor(); }));
 $$('.stab').forEach(b => b.addEventListener('click', () => {
   $$('.stab').forEach(x => x.setAttribute('aria-selected', String(x === b)));

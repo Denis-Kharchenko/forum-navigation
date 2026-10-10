@@ -498,6 +498,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
         </svg>
 
         <div class="floors" role="group" aria-label="Выбор этажа">
+          <button type="button" class="floor-btn" data-floor="4" aria-pressed="false" aria-label="3 этаж"><b>3</b><span>этаж</span></button>
           <button type="button" class="floor-btn" data-floor="3" aria-pressed="false" aria-label="Главная сцена"><b class="fl-sm">Главная</b><span>сцена</span></button>
           <button type="button" class="floor-btn" data-floor="2" aria-pressed="false" aria-label="2 этаж"><b>2</b><span>этаж</span></button>
           <button type="button" class="floor-btn" data-floor="1" aria-pressed="true" aria-label="1 этаж"><b>1</b><span>этаж</span></button>
@@ -624,10 +625,11 @@ const PROFESSIONS = [
 ];
 
 // маршрут начинается от стойки; точка стойки поворачивается вместе с этажом
-PATHS[KIOSK.floor].nodes.K = [KIOSK.x, KIOSK.y];
+// (если у этажа стойки ещё нет плана и схемы проходов — маршруты от стойки отключены)
+if (PATHS[KIOSK.floor]) PATHS[KIOSK.floor].nodes.K = [KIOSK.x, KIOSK.y];
 // названия и штриховка помещений из админки (data/schedule.js → rooms)
 prepareRooms(SCHEDULE.rooms || {});
-[KIOSK.x, KIOSK.y] = PATHS[KIOSK.floor].nodes.K;
+if (PATHS[KIOSK.floor]) [KIOSK.x, KIOSK.y] = PATHS[KIOSK.floor].nodes.K;
 
 /* ==========================================================================
    Логика
@@ -759,7 +761,7 @@ function renderFloor(f) {
   renderPlan($('#world'), f, { onSelect: id => selectRoom(id, false) });
   const rooms = ROOMS.filter(r => r.floor === f);
 
-  if (KIOSK.floor === f) {
+  if (KIOSK.floor === f && !FLOORS[f].placeholder) {
     const g = svgEl('g', { 'pointer-events': 'none' });
     const k = labelScale(), { x, y } = KIOSK;   // на телефоне метка крупнее
     g.innerHTML = `<circle class="here__pulse" cx="${x}" cy="${y}" r="${22 * k}"/>
@@ -815,7 +817,7 @@ function selectRoom(id, focusPlan = true, stay = false) {
   const agenda = roomAgenda(id), ag = $('#dAgenda');
   ag.hidden = !agenda.length;
   ag.innerHTML = agenda.map(({ it, now }) => `<li${now ? ' class="is-now"' : ''}><time>${esc(it.start)}</time><span><b>${esc(it.title)}</b>${it.speaker ? `<small>${esc(it.speaker)}</small>` : ''}</span></li>`).join('');
-  $('#dRoute').hidden = !DOORS[id];
+  $('#dRoute').hidden = !computeRoute(id);   // маршрут есть, только если известны проходы от стойки
   $('#detail').hidden = false;
   if (!$('#plan').classList.contains('sb-open')) { setSidebar(true, false); focusPlan = !stay; }
   if (focusPlan) plan.focus(bboxOf(r));
@@ -850,7 +852,8 @@ function shortest(f, from, to) {
 }
 function computeRoute(id) {
   const r = ROOMS.find(r => r.id === id), door = DOORS[id];
-  if (!r || !door) return null;
+  if (!r || !door || !PATHS[KIOSK.floor] || !PATHS[r.floor]) return null;
+  if (r.floor !== KIOSK.floor && (!STAIRS[KIOSK.floor] || !STAIRS[r.floor])) return null;
   const [via, pt] = door;
   if (r.floor === KIOSK.floor) {
     const p = shortest(r.floor, 'K', via);
