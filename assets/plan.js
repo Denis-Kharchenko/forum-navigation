@@ -191,7 +191,7 @@ function renderPlan(world, f, { clickable = r => r.list, onSelect = () => {} } =
         ? svgEl('polygon', { points: chamfer(r.rect) })
         : svgEl('rect', { x: r.rect[0], y: r.rect[1], width: r.rect[2], height: r.rect[3] });
     const click = clickable(r);
-    el.setAttribute('class', `room room--${r.type}${r.type === 'stairs' && r.rect[2] > r.rect[3] ? ' is-h' : ''}${click ? ' is-click' : ''}`);
+    el.setAttribute('class', `room room--${r.type}${r.type === 'stairs' && (r.dir ? r.dir === 'we' : r.rect[2] > r.rect[3]) ? ' is-h' : ''}${click ? ' is-click' : ''}`);
     el.dataset.id = r.id;
     // Цветная зона (сцена, фотозона…): обводка своим цветом, заливка — светлым оттенком или сплошная
     if (r.color) el.style.setProperty('--zc', r.color);
