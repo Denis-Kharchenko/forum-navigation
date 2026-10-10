@@ -45,3 +45,14 @@
 .railing-line { fill: none; stroke: #4a4a55; stroke-width: 4; stroke-linejoin: round; }
 .railing-posts { fill: none; stroke: #4a4a55; stroke-width: 11; stroke-linecap: round; stroke-dasharray: 0.1 30; }
 .column { fill: #4a4a55; }
+
+/* Тонкие подписи (этаж с lightLabels) и приглушённые (quiet) */
+.lbl.is-light .t1 { font-weight: 500; letter-spacing: .03em; }
+.lbl.is-quiet .t1 { fill: #8f95ad; }
+.lbl.is-quiet.is-active .t1 { fill: #fff; }
+/* Стрелки-указатели с подписью */
+.plan-arrow { --ac: var(--blue, #2450EC); }
+.plan-arrow.is-red { --ac: var(--red, #D00B12); }
+.plan-arrow line { stroke: var(--ac); stroke-width: 3; stroke-linecap: round; }
+.plan-arrow polygon { fill: var(--ac); }
+.plan-arrow text { font-family: var(--f-display); font-weight: 600; fill: var(--ac); dominant-baseline: central; letter-spacing: .04em; }

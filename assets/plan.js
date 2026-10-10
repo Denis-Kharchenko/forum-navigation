@@ -106,11 +106,12 @@ function drawLabel(g, r) {
   const cx = r.label ? r.label[0] : bx + bw / 2, cy = r.label ? r.label[1] : by + bh / 2;
   if (r.labelBox) [bw, bh] = r.labelBox;   // подпись рядом с узкой зоной — своя область для подбора размера
   const gray = (!EDITABLE.includes(r.type) && r.type !== 'zone') || r.type === 'service';
-  const ls = labelScale(), gs = ls > 1 ? ls * 1.4 : ls;   // серые подписи на телефоне — ещё крупнее, иначе не читаются
-  const tStyle = gray ? { cls: 't3', size: 16 * gs, k: 0.6 } : { cls: 't1', size: 30 * ls, k: 0.55 };
+  const light = FLOORS[r.floor]?.lightLabels && !gray;   // этаж с тонкими подписями — заголовки мельче
+  const ls = labelScale() * (r.lscale ?? 1) * (light ? 0.75 : 1), gs = labelScale() > 1 ? labelScale() * 1.4 : 1;   // серые подписи на телефоне — ещё крупнее, иначе не читаются
+  const tStyle = gray ? { cls: 't3', size: 16 * gs, k: 0.6 } : { cls: 't1', size: 30 * ls, k: light ? 0.52 : 0.55 };
   const sStyle = gray ? { cls: 't3', size: 14 * gs, k: 0.6 } : { cls: 't2', size: 20 * ls, k: 0.6 };
   const title = r.planTitle ?? r.title ?? '', sub = r.planSub ?? r.sub ?? '';
-  if (!title) return;
+  if (!title || r.noLabel) return;
   const variants = [[title], splitTwo(title)].filter(Boolean).map(tl => [
     ...tl.map(t => ({ t, ...tStyle })),
     ...(sub ? [{ t: sub, ...sStyle }] : []),
@@ -127,7 +128,7 @@ function drawLabel(g, r) {
   const options = variants.map(measure);
   // перенос на две строки — только если он заметно увеличивает шрифт
   const best = options[1] && options[1].f > options[0].f * 1.15 ? options[1] : options[0];
-  const text = svgEl('text', { class: `lbl lbl--${r.type}${r.labelBox ? ' is-outside' : ''}`, 'data-id': r.id });
+  const text = svgEl('text', { class: `lbl lbl--${r.type}${r.labelBox ? ' is-outside' : ''}${light ? ' is-light' : ''}${r.quiet ? ' is-quiet' : ''}`, 'data-id': r.id });
   if (r.color) text.style.setProperty('--zc', r.color);
   if (best.rotate) text.setAttribute('transform', `rotate(-90 ${cx} ${cy})`);
   let yy = cy - (best.needH * best.f) / 2;
@@ -180,6 +181,27 @@ function renderPlan(world, f, { clickable = r => r.list, onSelect = () => {} } =
   });
   // колонны
   (fl.columns || []).forEach(([x, y]) => over.appendChild(svgEl('rect', { x: x - 6, y: y - 6, width: 12, height: 12, class: 'column' })));
+  // стрелки-указатели с подписью («В пространство Форума», «Выход на террасу»)
+  const notes = svgEl('g', { 'pointer-events': 'none' });
+  (fl.arrows || []).forEach(a => {
+    const [x1, y1] = a.from, [x2, y2] = a.to, ang = Math.atan2(y2 - y1, x2 - x1), hl = 12, hw = 7;
+    const g = svgEl('g', { class: `plan-arrow ${a.cls || ''}` });
+    // линия заканчивается у основания наконечника, чтобы не торчать из острия
+    g.appendChild(svgEl('line', { x1, y1, x2: x2 - Math.cos(ang) * hl, y2: y2 - Math.sin(ang) * hl }));
+    const p = (dx, dy) => [x2 - Math.cos(ang) * dx - Math.sin(ang) * dy, y2 - Math.sin(ang) * dx + Math.cos(ang) * dy].join(',');
+    g.appendChild(svgEl('polygon', { points: [p(0, 0), p(hl, hw), p(hl, -hw)].join(' ') }));
+    if (a.text) {
+      // anchor: 'end' — подпись прижата правым краем к точке at (растёт влево, не наезжает на стену)
+      const s = a.size * Math.min(labelScale(), 1.3), t = svgEl('text', { x: a.at[0], y: a.at[1], 'text-anchor': a.anchor || 'middle' });
+      a.text.forEach((line, i) => {
+        const ts = svgEl('tspan', { x: a.at[0], y: a.at[1] + (i - (a.text.length - 1) / 2) * s * 1.15, 'font-size': s.toFixed(1) });
+        ts.textContent = line.toUpperCase();
+        t.appendChild(ts);
+      });
+      g.appendChild(t);
+    }
+    notes.appendChild(g);
+  });
   // Террасы и крыши — снаружи корпуса, рисуем первыми
   const outside = svgEl('g'), inside = svgEl('g'), labels = svgEl('g');
   ROOMS.filter(r => r.floor === f).forEach(r => {
@@ -209,7 +231,7 @@ function renderPlan(world, f, { clickable = r => r.list, onSelect = () => {} } =
     }
     drawLabel(labels, r);
   });
-  world.append(outside, strokes, fills, inside, over, labels);
+  world.append(outside, strokes, fills, inside, over, labels, notes);
 }
 
 /* Цвета треков выбирают организаторы — текст подстраиваем, чтобы он читался (контраст не ниже 4.5:1) */

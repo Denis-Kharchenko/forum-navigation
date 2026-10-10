@@ -25,6 +25,10 @@ const FLOORS = {
       // вход во двор с улицы (x 300–410) открыт; дальше перила отделяют закрытый участок
       { points: [[410, 1210], [410, 1040], [1025, 1040], [1025, 845]], cls: 'railing' },
     ],
+    // стрелки с подписью: from → to, подпись строками в точке at
+    arrows: [
+      { from: [96, 464], to: [96, 398], at: [110, 352], text: ['В пространство', 'Форума'], size: 12 },
+    ],
   },
   // 2 этаж: Главный холл — на плане «Главная сцена». outline — замкнутый контур стен этажа
   2: {
@@ -33,13 +37,18 @@ const FLOORS = {
   },
   // 3 этаж — над Главной сценой (ключ 4: ключ 3 уже занят Главной сценой)
   4: { w: 1220, h: 440, label: '3 этаж', level: 3, masses: [[20, 20, 1180, 400]] },
-  // Главная сцена: крупный план Главного холла 2 этажа.
+  // Главный холл: крупный план Главного холла 2 этажа (ключ 3).
   // label — подпись на кнопке и в заголовках, level — настоящий этаж (для подсказки «поднимитесь на…»)
+  // lightLabels — подписи помещений тоньше и мельче
   3: {
-    w: 1080, h: 1240, label: 'Главная сцена', level: 2,
+    w: 1080, h: 1240, label: 'Главный холл', level: 2, lightLabels: true,
     outline: [[190, 630], [320, 630], [320, 230], [910, 230], [910, 1230], [190, 1230]],
     // граница бельэтажа: от левой стены до лестницы (с отступом 14) и вниз вдоль её левого края
     lines: [{ points: [[206, 1100], [740, 1100], [740, 1214]], cls: 'balcony-line' }],
+    // выход на террасу: тонкая стрелка к двери и маленькая подпись
+    arrows: [
+      { from: [784, 842], to: [893, 842], at: [884, 818], anchor: 'end', text: ['Выход на террасу'], size: 12, cls: 'is-red' },
+    ],
   },
 };
 
@@ -57,8 +66,8 @@ const ROOMS = [
   { id: 'f1_wc', floor: 1, type: 'zone', list: true, icon: 'i-door', color: ZONE.blue, rect: [66, 56, 110, 100], t1: ['WC'] },
   { id: 'f1_sv1', floor: 1, type: 'service', rect: [66, 166, 110, 76] },
   { id: 'f1_stairs', floor: 1, type: 'stairs', rect: [66, 470, 60, 74], t3: ['Лестн.'] },
-  { id: 'f1_food', floor: 1, type: 'zone', list: true, icon: 'i-cup', color: ZONE.violet, round: true, rect: [285, 255, 190, 190], t1: ['Фуд-зона'] },
-  { id: 'f1_book', floor: 1, type: 'zone', list: true, icon: 'i-users', color: ZONE.orange, rect: [260, 420, 60, 40], label: [200, 440], labelBox: [76, 52], t1: ['Книга контактов'] },
+  { id: 'f1_food', floor: 1, type: 'zone', list: true, icon: 'i-cup', color: ZONE.violet, round: true, rect: [285, 255, 190, 190], t1: ['ГастроХолл'] },
+  { id: 'f1_book', floor: 1, type: 'zone', list: true, icon: 'i-users', color: ZONE.orange, rect: [226, 420, 92, 44], pad: 0.92, t1: ['Книга контактов'] },
   { id: 'f1_reg', floor: 1, type: 'zone', list: true, icon: 'i-pin', color: ZONE.red, rect: [460, 470, 120, 80], pad: 0.9, t1: ['Регистрация'] },
   // кафе кластера — заштрихованы
   { id: 'f1_cafe1', floor: 1, type: 'service', poly: [[540, 210], [600, 166], [704, 166], [704, 230], [560, 300]] },
@@ -70,8 +79,8 @@ const ROOMS = [
   { id: 'f1_cafe7', floor: 1, type: 'service', poly: [[370, 575], [460, 620], [460, 674], [370, 674]] },
   { id: 'f1_cafe8', floor: 1, type: 'service', poly: [[640, 590], [704, 558], [704, 674], [640, 674]] },
   { id: 'f1_cafe9', floor: 1, type: 'service', rect: [716, 436, 48, 238] },
-  { id: 'f1_admin', floor: 1, type: 'staff', poly: [[580, 620], [640, 590], [640, 674], [580, 674]], label: [610, 645], t1: ['Админ.'] },
-  { id: 'f1_entry', floor: 1, type: 'zone', list: true, icon: 'i-exit', color: ZONE.wine, solid: true, rect: [470, 684, 100, 12], label: [650, 742], labelBox: [130, 56], t1: ['Вход в здание'] },
+  // noLabel — на плане без подписи (в списке помещений остаётся)
+  { id: 'f1_entry', floor: 1, type: 'zone', list: true, icon: 'i-exit', color: ZONE.wine, solid: true, noLabel: true, rect: [470, 684, 100, 12], t1: ['Вход в здание'] },
 
   // ---------- 3 этаж (над Главной сценой) ----------
   { id: 'r6', floor: 4, type: 'hall', list: true, badge: '1', rect: [650, 36, 534, 134], t1: ['Зал 1'], t2: ['Созидая Общество'] },
@@ -96,20 +105,23 @@ const ROOMS = [
   // область справа не используется — неактивна (заштрихована, без подписи)
   { id: 'sv2off', floor: 2, type: 'service', poly: [[1350, 56], [1744, 56], [1744, 724], [1120, 724], [1120, 480], [1350, 480]] },
 
-  // ---------- Главная сцена ----------
+  // ---------- Главный холл (план «Главная сцена») ----------
+  // lscale — подпись мельче обычного, quiet — подпись приглушённая
   { id: 'gs_t1', floor: 3, type: 'terrace', rect: [190, 70, 720, 160], t3: ['Терраса'] },
   { id: 'gs_t2', floor: 3, type: 'terrace', rect: [910, 70, 160, 160] },
   { id: 'gs_t3', floor: 3, type: 'terrace', rect: [910, 230, 160, 280], t3: ['Терраса'] },
   { id: 'gs_t4', floor: 3, type: 'terrace', rect: [910, 510, 160, 590], t3: ['Терраса'] },
   { id: 'r7', floor: 3, type: 'main', list: true, icon: 'i-door', poly: [[336, 510], [894, 510], [894, 1214], [206, 1214], [206, 646], [336, 646]], label: [570, 870], t1: ['Главный холл'] },
-  { id: 'gs_vip', floor: 3, type: 'other', list: true, icon: 'i-star', rect: [616, 246, 278, 254], t1: ['ВИП-зал'] },
+  { id: 'gs_vip', floor: 3, type: 'other', list: true, icon: 'i-star', rect: [616, 246, 278, 254], lscale: 0.55, quiet: true, t1: ['ВИП-зал'] },
+  // ряд стендов вдоль верхней стены холла — от угла холла до фотозоны
+  { id: 'gs_partners', floor: 3, type: 'zone', list: true, icon: 'i-users', color: '#8a8a95', rect: [346, 520, 388, 50], lscale: 0.8, t1: ['Друзья и партнёры'] },
   { id: 'gs_stairs', floor: 3, type: 'stairs', rect: [754, 1130, 72, 74], t3: ['Лестн.'] },
   { id: 'gs_stage', floor: 3, type: 'zone', list: true, icon: 'i-mic', color: ZONE.violet, rect: [216, 750, 140, 260], t1: ['Сцена'] },
-  { id: 'gs_photo', floor: 3, type: 'zone', list: true, icon: 'i-cam', color: ZONE.teal, rect: [744, 520, 140, 140], t1: ['Фотозона'] },
-  { id: 'gs_peter', floor: 3, type: 'zone', list: true, icon: 'i-users', color: ZONE.orange, rect: [744, 950, 140, 130], t1: ['Поговорить', 'с Петром I'] },
+  { id: 'gs_photo', floor: 3, type: 'zone', list: true, icon: 'i-cam', color: '#4F97D6', rect: [744, 520, 140, 140], lscale: 0.7, t1: ['Фотозона'] },
+  { id: 'gs_peter', floor: 3, type: 'zone', list: true, icon: 'i-users', color: ZONE.orange, rect: [744, 950, 140, 130], t1: ['Интерактивная', 'зона'] },
   { id: 'gs_wc', floor: 3, type: 'zone', list: true, icon: 'i-door', color: ZONE.blue, rect: [216, 1112, 120, 92], t1: ['WC'] },
-  { id: 'gs_exit', floor: 3, type: 'zone', list: true, icon: 'i-exit', color: ZONE.red, solid: true, rect: [903, 770, 14, 140], label: [800, 840], labelBox: [150, 110], t1: ['Выход на террасу'] },
-  { id: 'gs_pass', floor: 3, type: 'zone', list: true, icon: 'i-pass', color: ZONE.wine, solid: true, poly: [[480, 400], [616, 400], [616, 460], [550, 460], [550, 510], [480, 510]], label: [403, 445], labelBox: [150, 120], t1: ['Проход в ВИП-зал'] },
+  // подпись выхода — маленькая, у двери, со стрелкой (FLOORS[3].arrows)
+  { id: 'gs_exit', floor: 3, type: 'zone', list: true, icon: 'i-exit', color: ZONE.red, solid: true, noLabel: true, rect: [903, 770, 14, 140], t1: ['Выход на террасу'] },
 ];
 
 /* ==========================================================================
@@ -129,10 +141,11 @@ const PATHS = {
   },
   3: {
     nodes: {
-      K: [680, 1015], A: [560, 1015], B: [560, 880], C: [560, 600], P: [550, 530], D: [814, 700], E: [880, 840],
+      K: [680, 1015], A: [560, 1015], B: [560, 880], C: [560, 600], Q: [739, 600], P: [739, 512], D: [814, 700], E: [880, 840],
       Wn: [276, 1090], Gs: [790, 1100], S3: [790, 1167],
     },
-    edges: [['K', 'A'], ['A', 'B'], ['B', 'C'], ['C', 'P'], ['C', 'D'], ['B', 'E'], ['A', 'Wn'], ['K', 'Gs'], ['Gs', 'S3'], ['Gs', 'A']],
+    // в ВИП-зал — между стендами «Друзья и партнёры» и фотозоной
+    edges: [['K', 'A'], ['A', 'B'], ['B', 'C'], ['C', 'Q'], ['Q', 'P'], ['C', 'D'], ['B', 'E'], ['A', 'Wn'], ['K', 'Gs'], ['Gs', 'S3'], ['Gs', 'A']],
   },
   4: {
     nodes: {
@@ -151,11 +164,11 @@ const PATHS = {
 
 const DOORS = {
   // 1 этаж
-  f1_entry: ['Eo', [520, 704]], f1_reg: ['J', [520, 555]], f1_food: ['F', [390, 447]], f1_book: ['Bk', [290, 462]],
+  f1_entry: ['Eo', [520, 704]], f1_reg: ['J', [520, 555]], f1_food: ['F', [390, 447]], f1_book: ['Bk', [290, 466]],
   f1_wc: ['W2', [182, 120]],
-  // Главная сцена
+  // Главный холл
   r7: ['B', [560, 880]], gs_stage: ['B', [360, 880]], gs_photo: ['D', [814, 664]], gs_peter: ['K', [740, 1015]],
-  gs_wc: ['Wn', [276, 1108]], gs_exit: ['E', [896, 840]], gs_pass: ['P', [550, 512]], gs_vip: ['P', [616, 430]],
+  gs_wc: ['Wn', [276, 1108]], gs_exit: ['E', [896, 840]], gs_vip: ['P', [739, 500]], gs_partners: ['C', [560, 572]],
   r1: ['C2', [208, 255]], r2: ['C2', [208, 175]],
   r4: ['C7', [855, 210]], r5: ['C5', [670, 255]], r6: ['C6', [760, 165]],
   r10: ['Cw', [660, 500]], f2_wc: ['Hw', [220, 415]], r9: ['Cg', [1180, 465]],
@@ -166,7 +179,7 @@ const DOORS = {
    floor — план, на котором стоит стойка; x, y — точка «Вы здесь»; badge — смещение плашки «Вы здесь» от точки */
 const STANDS = {
   1: { floor: 1, x: 450, y: 730, badge: [-150, -18], name: 'У входа в здание' },
-  2: { floor: 3, x: 680, y: 1015, name: 'Главная сцена, у «Поговорить с Петром I»' },
+  2: { floor: 3, x: 680, y: 1015, name: 'Главный холл, у интерактивной зоны' },
 };
 
 // Связи лестниц: [план, узел, план, узел]. Внутренняя лестница 1 этажа ведёт на лестницу 2 этажа,
