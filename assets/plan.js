@@ -168,7 +168,9 @@ function renderPlan(world, f, { clickable = r => r.list, onSelect = () => {} } =
   // Этаж произвольной формы: заливка контуром, стены — ломаной (может быть незамкнутой)
   const pts = list => list.map(p => p.join(',')).join(' ');
   if (fl.outline) fills.appendChild(svgEl('polygon', { points: pts(fl.outline), class: 'mass-fill' }));
+  // стены: своя ломаная (walls) или замкнутый контур этажа (outline)
   if (fl.walls) over.appendChild(svgEl('polyline', { points: pts(fl.walls), class: 'wall-line' }));
+  else if (fl.outline) over.appendChild(svgEl('polygon', { points: pts(fl.outline), class: 'wall-line' }));
   // Линии поверх помещений (например, граница бельэтажа)
   (fl.lines || []).forEach(l => over.appendChild(svgEl('polyline', { points: pts(l.points), class: l.cls })));
   // Террасы и крыши — снаружи корпуса, рисуем первыми
