@@ -445,30 +445,3 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 /* на сайте текст можно выделять и копировать, и страница не «киоск» */
 body.is-web { user-select: auto; -webkit-user-select: auto; }
 .is-web .plan__svg, .is-web button { user-select: none; -webkit-user-select: none; }
-
-/* ===== Телефон: кнопки крупнее (~+15%) ===== */
-@media (max-width: 600px) {
-  .tab { min-height: 72px; font-size: 15px; }
-  .tab .ico { width: 28px; height: 28px; }
-  .floor-btn { width: 68px; height: 68px; }
-  .floor-btn b { font-size: 30px; }
-  .floor-btn span { font-size: 12px; }
-  .floor-btn b.fl-sm { font-size: 14px; }
-  .zoom { gap: 8px; }
-  .zoom button { width: 54px; height: 54px; }
-  .zoom .ico { width: 26px; height: 26px; }
-  .sb-toggle { width: 190px; height: 40px; top: -40px; font-size: 14px; }
-  .rooms li { min-height: 50px; }
-  .room-btn { grid-template-columns: 32px minmax(0, 1fr); }
-  .room-num { width: 32px; height: 32px; font-size: 15px; }
-  .room-num .ico { width: 18px; height: 18px; }
-  .room-btn b { font-size: 14px; }
-  .room-btn small { font-size: 12px; }
-  .detail__close { width: 46px; height: 46px; }
-  .btn-route { min-height: 46px; font-size: 15px; }
-  #chips .chip { min-height: 50px; font-size: 16px; padding: 0 16px; }
-  #progChips .chip--track { min-height: 50px; font-size: 14px; }
-  .btn-map { min-height: 40px; font-size: 13px; padding: 0 12px; }
-  .btn-map .ico { width: 15px; height: 15px; }
-  .timeline.is-tiny .btn-map { min-height: 32px; }
-}
