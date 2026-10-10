@@ -612,7 +612,10 @@ const KIOSK = { ...STANDS[STAND_ID] };
 const levelOf = f => FLOORS[f].level || f;
 const stepText = level => `${level > levelOf(KIOSK.floor) ? 'Поднимитесь' : 'Спуститесь'} по лестнице на ${level} этаж`;
 // Подсказка при переходе с плана на план: другой этаж — «поднимитесь/спуститесь», тот же уровень — «пройдите»
-const transferText = to => levelOf(to) === levelOf(KIOSK.floor) ? `Пройдите по лестнице: ${floorName(to)}` : stepText(levelOf(to));
+const transferText = to => {
+  const base = levelOf(to) === levelOf(KIOSK.floor) ? 'Пройдите по лестнице' : stepText(levelOf(to));
+  return FLOORS[to].label && !/этаж/.test(FLOORS[to].label) ? `${base} — ${floorName(to)}` : base;
+};
 const IDLE_SECONDS = 120;                      // сброс к началу при бездействии
 
 const SCHEDULE = window.FORUM_SCHEDULE || { date: '2026-10-23', items: [] };
@@ -841,37 +844,43 @@ const wait = ms => new Promise(res => setTimeout(res, ms));
 const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
 
-// Кратчайший путь по графу проходов этажа (Дейкстра) — список точек
-function shortest(f, from, to) {
-  const { nodes, edges } = PATHS[f], adj = {};
-  edges.forEach(([a, b]) => { (adj[a] ||= []).push(b); (adj[b] ||= []).push(a); });
-  const d = { [from]: 0 }, prev = {}, todo = new Set(Object.keys(nodes));
+// Маршрут по общей схеме проходов всех этажей (Дейкстра). Узлы — «план:узел»,
+// между планами — переходы по лестницам из STAIR_LINKS
+const STAIR_COST = 300;   // «длина» перехода по лестнице — чтобы лишний раз не менять этаж
+function computeRoute(id) {
+  const r = ROOMS.find(r => r.id === id), door = DOORS[id];
+  if (!r || !door || !PATHS[KIOSK.floor] || !PATHS[r.floor]) return null;
+  const pos = {}, adj = {};
+  const link = (a, b, w) => { (adj[a] ||= []).push([b, w]); (adj[b] ||= []).push([a, w]); };
+  for (const f in PATHS) {
+    const g = PATHS[f];
+    for (const n in g.nodes) pos[`${f}:${n}`] = [+f, g.nodes[n]];
+    g.edges.forEach(([a, b]) => link(`${f}:${a}`, `${f}:${b}`, dist(g.nodes[a], g.nodes[b])));
+  }
+  STAIR_LINKS.forEach(([fa, a, fb, b]) => { if (pos[`${fa}:${a}`] && pos[`${fb}:${b}`]) link(`${fa}:${a}`, `${fb}:${b}`, STAIR_COST); });
+  const from = `${KIOSK.floor}:K`, to = `${r.floor}:${door[0]}`;
+  if (!pos[from] || !pos[to]) return null;
+  const d = { [from]: 0 }, prev = {}, todo = new Set(Object.keys(pos));
   while (todo.size) {
     let u = null;
     todo.forEach(n => { if (d[n] !== undefined && (u === null || d[n] < d[u])) u = n; });
     if (u === null || u === to) break;
     todo.delete(u);
-    (adj[u] || []).forEach(v => {
-      const nd = d[u] + dist(nodes[u], nodes[v]);
-      if (d[v] === undefined || nd < d[v]) { d[v] = nd; prev[v] = u; }
-    });
+    (adj[u] || []).forEach(([v, w]) => { if (d[v] === undefined || d[u] + w < d[v]) { d[v] = d[u] + w; prev[v] = u; } });
   }
   if (d[to] === undefined) return null;
   const path = [to];
   while (path[0] !== from) path.unshift(prev[path[0]]);
-  return path.map(n => nodes[n]);
-}
-function computeRoute(id) {
-  const r = ROOMS.find(r => r.id === id), door = DOORS[id];
-  if (!r || !door || !PATHS[KIOSK.floor] || !PATHS[r.floor]) return null;
-  if (r.floor !== KIOSK.floor && (!STAIRS[KIOSK.floor] || !STAIRS[r.floor])) return null;
-  const [via, pt] = door;
-  if (r.floor === KIOSK.floor) {
-    const p = shortest(r.floor, 'K', via);
-    return p && { target: id, floors: [r.floor], segs: { [r.floor]: [...p, pt] } };
-  }
-  const a = shortest(KIOSK.floor, 'K', STAIRS[KIOSK.floor]), b = shortest(r.floor, STAIRS[r.floor], via);
-  return a && b && { target: id, floors: [KIOSK.floor, r.floor], segs: { [KIOSK.floor]: a, [r.floor]: [...b, pt] } };
+  // делим путь на участки по планам; транзитные лестничные площадки (одна точка) пропускаем
+  const segs = [];
+  path.forEach(k => {
+    const [f, p] = pos[k];
+    if (!segs.length || segs.at(-1).floor !== f) segs.push({ floor: f, pts: [] });
+    segs.at(-1).pts.push(p);
+  });
+  const shown = segs.filter((sg, i) => sg.pts.length > 1 || i === 0 || i === segs.length - 1);
+  shown.at(-1).pts.push(door[1]);
+  return { target: id, floors: shown.map(sg => sg.floor), segs: Object.fromEntries(shown.map(sg => [sg.floor, sg.pts])) };
 }
 
 const badge = ([x, y], text, k = labelScale()) => `<g class="route__badge"><rect x="${x - 78 * k}" y="${y - 70 * k}" width="${156 * k}" height="${38 * k}"/>
@@ -885,14 +894,14 @@ function drawRoute(f, animate) {
   const d = 'M' + pts.map(p => p.map(n => n.toFixed(1)).join(' ')).join(' L');
   const len = pts.slice(1).reduce((s, p, i) => s + dist(pts[i], p), 0);
   const { w, h } = FLOORS[f];
-  const end = pts.at(-1), next = route.floors[route.floors.indexOf(f) + 1];
+  const idx = route.floors.indexOf(f), end = pts.at(-1), prev = route.floors[idx - 1], next = route.floors[idx + 1];
   const g = svgEl('g', { id: 'route', 'pointer-events': 'none' });
   g.innerHTML = `
     <mask id="route-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="${w}" height="${h}">
       <path class="route__reveal" d="${d}" stroke-dasharray="${len} ${len}" stroke-dashoffset="${animate ? len : 0}"/>
     </mask>
     <g mask="url(#route-mask)"><path class="route__halo" d="${d}"/><path class="route__line" d="${d}"/></g>
-    ${f !== KIOSK.floor ? badge(pts[0], levelOf(f) === levelOf(KIOSK.floor) ? 'ЛЕСТНИЦА' : `С ${levelOf(KIOSK.floor)} ЭТАЖА`) : ''}
+    ${prev ? badge(pts[0], levelOf(f) === levelOf(prev) ? 'ЛЕСТНИЦА' : `С ${levelOf(prev)} ЭТАЖА`) : ''}
     <g class="route__end" opacity="${animate ? 0 : 1}">
       ${next ? badge(end, levelOf(next) === levelOf(f) ? 'ЛЕСТНИЦА' : `НА ${levelOf(next)} ЭТАЖ`) : `<circle class="here__pulse" cx="${end[0]}" cy="${end[1]}" r="${20 * labelScale()}"/><circle class="route__dot" cx="${end[0]}" cy="${end[1]}" r="${14 * labelScale()}"/>`}
     </g>`;
