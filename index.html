@@ -602,7 +602,13 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
    НАСТРОЙКИ СТОЙКИ. Помещения — в data/rooms.js, программа — в data/schedule.js
    (её заполняют организаторы через admin.html).
    ========================================================================== */
-const KIOSK = { floor: 1, x: 230, y: 470 };   // где стоит стойка («Вы здесь»)
+// Стойка навигации: номер берётся из адреса (index.html?stand=2), без параметра — стойка 1.
+// Где стоят стойки — в data/rooms.js (STANDS)
+const STAND_ID = STANDS[new URLSearchParams(location.search).get('stand')] ? new URLSearchParams(location.search).get('stand') : '1';
+const KIOSK = { ...STANDS[STAND_ID] };
+// Настоящий этаж плана (у «Главной сцены» это 2) — для подсказок «поднимитесь / спуститесь»
+const levelOf = f => FLOORS[f].level || f;
+const stepText = level => `${level > levelOf(KIOSK.floor) ? 'Поднимитесь' : 'Спуститесь'} по лестнице на ${level} этаж`;
 const IDLE_SECONDS = 120;                      // сброс к началу при бездействии
 
 const SCHEDULE = window.FORUM_SCHEDULE || { date: '2026-10-23', items: [] };
@@ -764,10 +770,11 @@ function renderFloor(f) {
   if (KIOSK.floor === f && !FLOORS[f].placeholder) {
     const g = svgEl('g', { 'pointer-events': 'none' });
     const k = labelScale(), { x, y } = KIOSK;   // на телефоне метка крупнее
+    const [bx, by] = KIOSK.badge || [-62, -66];   // плашка «Вы здесь» — над точкой или со сдвигом
     g.innerHTML = `<circle class="here__pulse" cx="${x}" cy="${y}" r="${22 * k}"/>
       <circle cx="${x}" cy="${y}" r="${16 * k}" fill="#D00B12" stroke="#fff" stroke-width="${5 * k}"/>
-      <rect x="${x - 62 * k}" y="${y - 66 * k}" width="${124 * k}" height="${36 * k}" fill="#D00B12"/>
-      <text x="${x}" y="${y - 48 * k}" text-anchor="middle" dominant-baseline="central" fill="#fff" font-family="Oswald, sans-serif" font-weight="700" font-size="${22 * k}" letter-spacing="1">ВЫ ЗДЕСЬ</text>`;
+      <rect x="${x + bx * k}" y="${y + by * k}" width="${124 * k}" height="${36 * k}" fill="#D00B12"/>
+      <text x="${x + (bx + 62) * k}" y="${y + (by + 18) * k}" text-anchor="middle" dominant-baseline="central" fill="#fff" font-family="Oswald, sans-serif" font-weight="700" font-size="${22 * k}" letter-spacing="1">ВЫ ЗДЕСЬ</text>`;
     $('#world').appendChild(g);
   }
 
@@ -812,8 +819,8 @@ function selectRoom(id, focusPlan = true, stay = false) {
   $('#detail').classList.toggle('is-staff', r.type === 'staff');
   const hint = $('#dHint');
   const level = FLOORS[r.floor].level || r.floor;   // «Главная сцена» — это 2 этаж
-  hint.hidden = level === KIOSK.floor;
-  hint.querySelector('span').textContent = `Поднимитесь по лестнице на ${level} этаж`;
+  hint.hidden = level === levelOf(KIOSK.floor);
+  hint.querySelector('span').textContent = stepText(level);
   const agenda = roomAgenda(id), ag = $('#dAgenda');
   ag.hidden = !agenda.length;
   ag.innerHTML = agenda.map(({ it, now }) => `<li${now ? ' class="is-now"' : ''}><time>${esc(it.start)}</time><span><b>${esc(it.title)}</b>${it.speaker ? `<small>${esc(it.speaker)}</small>` : ''}</span></li>`).join('');
@@ -881,9 +888,9 @@ function drawRoute(f, animate) {
       <path class="route__reveal" d="${d}" stroke-dasharray="${len} ${len}" stroke-dashoffset="${animate ? len : 0}"/>
     </mask>
     <g mask="url(#route-mask)"><path class="route__halo" d="${d}"/><path class="route__line" d="${d}"/></g>
-    ${f !== KIOSK.floor ? badge(pts[0], `С ${KIOSK.floor} ЭТАЖА`) : ''}
+    ${f !== KIOSK.floor ? badge(pts[0], `С ${levelOf(KIOSK.floor)} ЭТАЖА`) : ''}
     <g class="route__end" opacity="${animate ? 0 : 1}">
-      ${next ? badge(end, `НА ${next} ЭТАЖ`) : `<circle class="here__pulse" cx="${end[0]}" cy="${end[1]}" r="${20 * labelScale()}"/><circle class="route__dot" cx="${end[0]}" cy="${end[1]}" r="${14 * labelScale()}"/>`}
+      ${next ? badge(end, `НА ${levelOf(next)} ЭТАЖ`) : `<circle class="here__pulse" cx="${end[0]}" cy="${end[1]}" r="${20 * labelScale()}"/><circle class="route__dot" cx="${end[0]}" cy="${end[1]}" r="${14 * labelScale()}"/>`}
     </g>`;
   $('#world').appendChild(g);
   if (!animate || reduceMotion.matches) {
@@ -923,7 +930,7 @@ async function playRoute(id) {
     await drawRoute(f, true);
     if (token !== routeToken) return;
     if (i < rt.floors.length - 1) {
-      showStep(`Поднимитесь по лестнице на ${rt.floors[i + 1]} этаж`);
+      showStep(stepText(levelOf(rt.floors[i + 1])));
       await wait(1400);
       if (token !== routeToken) return;
     }

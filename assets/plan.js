@@ -119,7 +119,7 @@ function drawLabel(g, r) {
   const measure = lines => {
     const needW = Math.max(...lines.map(l => l.t.length * l.size * l.k));
     const needH = lines.reduce((a, l) => a + l.size * 1.2, 0);
-    const pad = r.type === 'zone' && !r.labelBox ? 0.72 : 0.86;   // у зон толстая рамка — подпись с запасом
+    const pad = r.pad ?? (r.type === 'zone' && !r.labelBox ? 0.72 : 0.86);   // pad — своя доля ширины под подпись   // у зон толстая рамка — подпись с запасом
     const fit = (fw, fh) => Math.min(1, fw * pad / needW, fh * 0.8 / needH);
     const rotate = fit(bh, bw) > fit(bw, bh) * 1.4;
     return { lines, needH, rotate, f: rotate ? fit(bh, bw) : fit(bw, bh) };
@@ -176,7 +176,9 @@ function renderPlan(world, f, { clickable = r => r.list, onSelect = () => {} } =
   // Террасы и крыши — снаружи корпуса, рисуем первыми
   const outside = svgEl('g'), inside = svgEl('g'), labels = svgEl('g');
   ROOMS.filter(r => r.floor === f).forEach(r => {
-    const el = r.poly
+    const el = r.round
+      ? svgEl('ellipse', { cx: r.rect[0] + r.rect[2] / 2, cy: r.rect[1] + r.rect[3] / 2, rx: r.rect[2] / 2, ry: r.rect[3] / 2 })   // круглая зона
+      : r.poly
       ? svgEl('polygon', { points: r.poly.map(p => p.join(',')).join(' ') })
       : CHAMFERED.includes(r.type) && !r.solid
         ? svgEl('polygon', { points: chamfer(r.rect) })
