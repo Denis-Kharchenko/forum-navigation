@@ -107,7 +107,7 @@ function drawLabel(g, r) {
   if (r.labelBox) [bw, bh] = r.labelBox;   // подпись рядом с узкой зоной — своя область для подбора размера
   const gray = (!EDITABLE.includes(r.type) && r.type !== 'zone') || r.type === 'service';
   const ls = labelScale();
-  const tStyle = gray ? { cls: 't3', size: 16 * ls, k: 0.6 } : { cls: 't1', size: 30 * ls, k: 0.52 };
+  const tStyle = gray ? { cls: 't3', size: 16 * ls, k: 0.6 } : { cls: 't1', size: 30 * ls, k: 0.55 };
   const sStyle = gray ? { cls: 't3', size: 14 * ls, k: 0.6 } : { cls: 't2', size: 20 * ls, k: 0.6 };
   const title = r.planTitle ?? r.title ?? '', sub = r.planSub ?? r.sub ?? '';
   if (!title) return;
@@ -119,7 +119,8 @@ function drawLabel(g, r) {
   const measure = lines => {
     const needW = Math.max(...lines.map(l => l.t.length * l.size * l.k));
     const needH = lines.reduce((a, l) => a + l.size * 1.2, 0);
-    const fit = (fw, fh) => Math.min(1, fw * 0.86 / needW, fh * 0.8 / needH);
+    const pad = r.type === 'zone' && !r.labelBox ? 0.72 : 0.86;   // у зон толстая рамка — подпись с запасом
+    const fit = (fw, fh) => Math.min(1, fw * pad / needW, fh * 0.8 / needH);
     const rotate = fit(bh, bw) > fit(bw, bh) * 1.4;
     return { lines, needH, rotate, f: rotate ? fit(bh, bw) : fit(bw, bh) };
   };
@@ -138,6 +139,13 @@ function drawLabel(g, r) {
     yy += sz * 1.2;
   });
   g.appendChild(text);
+}
+
+// Фирменный срезанный правый нижний угол — как у кнопок и карточек сайта
+const CHAMFERED = ['hall', 'main', 'staff', 'other', 'zone'];
+function chamfer([x, y, w, h]) {
+  const c = Math.min(22, w * 0.18, h * 0.18);
+  return [[x, y], [x + w, y], [x + w, y + h - c], [x + w - c, y + h], [x, y + h]].map(p => p.join(',')).join(' ');
 }
 
 // Рисует этаж f в группу world. clickable(r) — какие помещения нажимаются, onSelect(id) — обработчик
@@ -168,7 +176,9 @@ function renderPlan(world, f, { clickable = r => r.list, onSelect = () => {} } =
   ROOMS.filter(r => r.floor === f).forEach(r => {
     const el = r.poly
       ? svgEl('polygon', { points: r.poly.map(p => p.join(',')).join(' ') })
-      : svgEl('rect', { x: r.rect[0], y: r.rect[1], width: r.rect[2], height: r.rect[3] });
+      : CHAMFERED.includes(r.type) && !r.solid
+        ? svgEl('polygon', { points: chamfer(r.rect) })
+        : svgEl('rect', { x: r.rect[0], y: r.rect[1], width: r.rect[2], height: r.rect[3] });
     const click = clickable(r);
     el.setAttribute('class', `room room--${r.type}${r.type === 'stairs' && r.rect[2] > r.rect[3] ? ' is-h' : ''}${click ? ' is-click' : ''}`);
     el.dataset.id = r.id;

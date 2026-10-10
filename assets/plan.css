@@ -25,7 +25,7 @@
 .lbl.is-active .t1, .lbl.is-active .t2, .lbl.is-active .t3 { fill: #fff; }
 
 /* Этаж произвольной формы: стены ломаной, граница бельэтажа — ровный пунктир */
-.wall-line { fill: none; stroke: var(--ink, #111114); stroke-width: 10; stroke-linejoin: miter; stroke-linecap: square; }
+.wall-line { fill: none; stroke: var(--ink, #111114); stroke-width: 12; stroke-linejoin: miter; stroke-linecap: square; }
 .balcony-line { fill: none; stroke: var(--ink, #111114); stroke-width: 7; stroke-dasharray: 24 16; stroke-linecap: butt; }
 
 /* Цветные зоны (сцена, фотозона…): цвет задаётся в данных помещения */
