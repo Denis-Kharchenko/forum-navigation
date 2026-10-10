@@ -21,7 +21,9 @@ const FLOORS = {
     lines: [
       { points: [[300, 845], [470, 845]], cls: 'railing' },
       { points: [[570, 845], [1115, 845]], cls: 'railing' },
-      { points: [[300, 845], [300, 1040], [1025, 1040], [1025, 845]], cls: 'railing' },
+      { points: [[300, 845], [300, 1040]], cls: 'railing' },
+      // вход во двор с улицы (x 300–410) открыт; дальше перила отделяют закрытый участок
+      { points: [[410, 1210], [410, 1040], [1025, 1040], [1025, 845]], cls: 'railing' },
     ],
   },
   // 2 этаж: Главный холл — на плане «Главная сцена». outline — замкнутый контур стен этажа
@@ -48,7 +50,8 @@ const ROOMS = [
   { id: 'f1_walk', floor: 1, type: 'terrace', rect: [160, 845, 140, 365], label: [230, 1170], t3: ['С улицы'] },
   { id: 'f1_yard', floor: 1, type: 'terrace', rect: [300, 845, 725, 195], label: [662, 942], t3: ['Двор'] },
   { id: 'f1_closed1', floor: 1, type: 'roof', rect: [1025, 845, 90, 195] },
-  { id: 'f1_closed2', floor: 1, type: 'roof', rect: [300, 1040, 815, 170] },
+  { id: 'f1_gate', floor: 1, type: 'terrace', rect: [300, 1040, 110, 170] },   // проход с улицы во двор
+  { id: 'f1_closed2', floor: 1, type: 'roof', rect: [410, 1040, 705, 170] },
   { id: 'f1_ostairs', floor: 1, type: 'stairs', dir: 'ns', rect: [470, 785, 100, 60], t3: ['Лестница'] },
   // здание
   { id: 'f1_wc', floor: 1, type: 'zone', list: true, icon: 'i-door', color: ZONE.blue, rect: [66, 56, 110, 100], t1: ['WC'] },
