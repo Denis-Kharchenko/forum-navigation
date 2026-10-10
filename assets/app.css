@@ -332,28 +332,28 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 
   /* нижние вкладки: иконка над подписью */
   .tabbar { gap: 6px; padding: 6px 10px calc(6px + env(safe-area-inset-bottom)); }
-  .tab { flex-direction: column; gap: 4px; min-height: 64px; padding: 0 2px; font-size: 14px; letter-spacing: .03em; }
-  .tab .ico { width: 26px; height: 26px; }
+  .tab { flex-direction: column; gap: 3px; min-height: 56px; padding: 0 2px; font-size: 13px; letter-spacing: .03em; }
+  .tab .ico { width: 22px; height: 22px; }
 
   .footnote { font-size: 12px; }
-  .floor-btn span { font-size: 11px; }
-  .floor-btn b.fl-sm { font-size: 13px; }
-  .zoom button { width: 48px; height: 48px; }
+  .floor-btn span { font-size: 9px; letter-spacing: .06em; }
+  .floor-btn b.fl-sm { font-size: 10px; }
+  .zoom button { width: 40px; height: 40px; }
   .card__num { font-size: 13px; }
   .chip { font-size: 15px; }
-  .tab { min-height: 64px; }
+  .tab { min-height: 56px; }
   .logo { padding-right: 30px; }
 
   /* навигация */
   .plan__top { left: 8px; top: 8px; right: 8px; }
   .legend { display: none; }
   .floors { left: 8px; }
-  .floor-btn { width: 60px; height: 60px; }
-  .floor-btn b { font-size: 26px; }
+  .floor-btn { width: 50px; height: 48px; }
+  .floor-btn b { font-size: 21px; }
   .zoom { right: 8px; gap: 6px; }
-  .zoom button { width: 48px; height: 48px; }
-  .zoom .ico { width: 24px; height: 24px; }
-  .sb-toggle { width: 170px; height: 34px; top: -34px; font-size: 13px; }
+  .zoom button { width: 40px; height: 40px; }
+  .zoom .ico { width: 20px; height: 20px; }
+  .sb-toggle { width: 150px; height: 30px; top: -30px; font-size: 12px; }
   .sidebar__head { padding: 8px 12px 2px; border-bottom: 0; }
   .sidebar__head .eyebrow { font-size: 11px; margin: 0; }
   .sidebar__head .h2 { display: none; }

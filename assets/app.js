@@ -98,8 +98,13 @@ const plan = (() => {
   function clamp() {
     const { w, h } = dims(), Wd = w * s, Hd = h * s, m = 60, aw = availW(), ah = H() - top();
     const l = left();
-    x = Wd <= aw ? l + (aw - Wd) / 2 : Math.min(l + m, Math.max(l + aw - Wd - m, x));
-    y = Hd <= ah ? top() + (ah - Hd) / 2 : Math.min(top() + m, Math.max(H() - Hd - m, y));
+    // этаж помещается целиком — держим его в кадре (сдвигать можно), не помещается — с запасом m по краям
+    x = Wd <= aw ? Math.min(l + aw - Wd, Math.max(l, x)) : Math.min(l + m, Math.max(l + aw - Wd - m, x));
+    y = Hd <= ah ? Math.min(H() - Hd, Math.max(top(), y)) : Math.min(top() + m, Math.max(H() - Hd - m, y));
+  }
+  function center() {
+    const { w, h } = dims();
+    x = left() + (availW() - w * s) / 2; y = top() + (H() - top() - h * s) / 2;
   }
   // Что показывать при открытии этажа: само здание (стены), а не весь участок с двором и террасами;
   // точка «Вы здесь» на этом этаже всегда попадает в кадр
@@ -118,12 +123,16 @@ const plan = (() => {
     const { w, h } = dims();
     base = Math.min(availW() / w, (H() - top()) / h) * 0.94;   // меньше этого не отдаляем
     const hb = !whole && homeBox();
-    if (!hb) { s = base; clamp(); apply(anim); return; }
+    if (!hb) { s = base; center(); clamp(); apply(anim); return; }
     const [bx, by, bw, bh] = hb;
-    const aw = availW() - ($('.zoom').offsetWidth + 16);   // справа — кнопки масштаба, здание под них не заходит
-    s = Math.max(base, Math.min(aw / bw, (H() - top()) / bh) * 0.92);
+    // справа — кнопки масштаба, здание под них не заходит. На телефоне экран узкий и высокий:
+    // кнопки масштаба внизу, под зданием, — отдаём зданию всю ширину
+    const phone = matchMedia('(max-width: 600px)').matches;
+    const aw = availW() - (phone ? 8 : $('.zoom').offsetWidth + 16);
+    const zb = phone ? $('.zoom').offsetHeight + 16 : 0;   // на телефоне снизу — кнопки масштаба
+    s = Math.max(base, Math.min(aw / bw, (H() - top() - zb) / bh) * (phone ? 0.98 : 0.92));
     x = left() + aw / 2 - (bx + bw / 2) * s;
-    y = (H() + top()) / 2 - (by + bh / 2) * s;
+    y = (H() - zb + top()) / 2 - (by + bh / 2) * s;
     clamp(); apply(anim);
   }
   function zoomAt(f, cx = left() + availW() / 2, cy = H() / 2, anim = false) {
@@ -182,7 +191,7 @@ const plan = (() => {
 })();
 
 /* --- Сайдбар --- */
-const SIDEBAR_DEFAULT = () => matchMedia('(max-width: 600px)').matches;   // при старте и после сброса
+const SIDEBAR_DEFAULT = () => false;   // при старте и после сброса список помещений свёрнут — карта на весь экран
 function setSidebar(open, refit = true) {
   $('#plan').classList.toggle('sb-open', open);
   $('#sbToggle').setAttribute('aria-expanded', String(open));
