@@ -68,7 +68,7 @@ function prepareRooms(overrides = {}) {
   ROOMS.forEach(r => {
     if (!r.base) r.base = {
       type: r.type, list: !!r.list,
-      title: (r.t1 || r.t3 || []).join(' ').replace('- ', '') || 'Служебное',
+      title: (r.t1 || r.t3 || []).join(' ').replace('- ', '') || (r.type === 'service' ? 'Служебное' : ''),
       sub: (r.t2 || []).join(' '),
     };
     Object.assign(r, { type: r.base.type, list: r.base.list, title: r.base.title, sub: r.base.sub });
@@ -102,9 +102,10 @@ const labelScale = () => (matchMedia('(max-width: 600px)').matches ? 1.5 : 1);
 
 // Подпись: подбираем перенос и размер шрифта, чтобы текст влез в помещение
 function drawLabel(g, r) {
-  const [bx, by, bw, bh] = bboxOf(r);
+  let [bx, by, bw, bh] = bboxOf(r);
   const cx = r.label ? r.label[0] : bx + bw / 2, cy = r.label ? r.label[1] : by + bh / 2;
-  const gray = !EDITABLE.includes(r.type) || r.type === 'service';
+  if (r.labelBox) [bw, bh] = r.labelBox;   // подпись рядом с узкой зоной — своя область для подбора размера
+  const gray = (!EDITABLE.includes(r.type) && r.type !== 'zone') || r.type === 'service';
   const ls = labelScale();
   const tStyle = gray ? { cls: 't3', size: 16 * ls, k: 0.6 } : { cls: 't1', size: 30 * ls, k: 0.52 };
   const sStyle = gray ? { cls: 't3', size: 14 * ls, k: 0.6 } : { cls: 't2', size: 20 * ls, k: 0.6 };
@@ -125,7 +126,8 @@ function drawLabel(g, r) {
   const options = variants.map(measure);
   // перенос на две строки — только если он заметно увеличивает шрифт
   const best = options[1] && options[1].f > options[0].f * 1.15 ? options[1] : options[0];
-  const text = svgEl('text', { class: `lbl lbl--${r.type}`, 'data-id': r.id });
+  const text = svgEl('text', { class: `lbl lbl--${r.type}${r.labelBox ? ' is-outside' : ''}`, 'data-id': r.id });
+  if (r.color) text.style.setProperty('--zc', r.color);
   if (best.rotate) text.setAttribute('transform', `rotate(-90 ${cx} ${cy})`);
   let yy = cy - (best.needH * best.f) / 2;
   best.lines.forEach(l => {
@@ -143,11 +145,17 @@ function renderPlan(world, f, { clickable = r => r.list, onSelect = () => {} } =
   world.innerHTML = '';
   const fl = FLOORS[f];
   // Стены: обводка объединения корпусов (обводка снизу, заливка сверху — внутренние стыки скрываются)
-  const strokes = svgEl('g'), fills = svgEl('g');
-  fl.masses.forEach(([x, y, w, h]) => {
+  const strokes = svgEl('g'), fills = svgEl('g'), over = svgEl('g');
+  (fl.masses || []).forEach(([x, y, w, h]) => {
     strokes.appendChild(svgEl('rect', { x, y, width: w, height: h, class: 'mass-stroke' }));
     fills.appendChild(svgEl('rect', { x, y, width: w, height: h, class: 'mass-fill' }));
   });
+  // Этаж произвольной формы: заливка контуром, стены — ломаной (может быть незамкнутой)
+  const pts = list => list.map(p => p.join(',')).join(' ');
+  if (fl.outline) fills.appendChild(svgEl('polygon', { points: pts(fl.outline), class: 'mass-fill' }));
+  if (fl.walls) over.appendChild(svgEl('polyline', { points: pts(fl.walls), class: 'wall-line' }));
+  // Линии поверх помещений (например, граница бельэтажа)
+  (fl.lines || []).forEach(l => over.appendChild(svgEl('polyline', { points: pts(l.points), class: l.cls })));
   // Террасы и крыши — снаружи корпуса, рисуем первыми
   const outside = svgEl('g'), inside = svgEl('g'), labels = svgEl('g');
   ROOMS.filter(r => r.floor === f).forEach(r => {
@@ -157,6 +165,9 @@ function renderPlan(world, f, { clickable = r => r.list, onSelect = () => {} } =
     const click = clickable(r);
     el.setAttribute('class', `room room--${r.type}${r.type === 'stairs' && r.rect[2] > r.rect[3] ? ' is-h' : ''}${click ? ' is-click' : ''}`);
     el.dataset.id = r.id;
+    // Цветная зона (сцена, фотозона…): обводка своим цветом, заливка — светлым оттенком или сплошная
+    if (r.color) el.style.setProperty('--zc', r.color);
+    if (r.solid) el.classList.add('is-solid');
     if (click) {
       el.setAttribute('role', 'button'); el.setAttribute('tabindex', '0');
       el.setAttribute('aria-label', [r.title, r.sub].filter(Boolean).join(' '));
@@ -170,5 +181,5 @@ function renderPlan(world, f, { clickable = r => r.list, onSelect = () => {} } =
     }
     drawLabel(labels, r);
   });
-  world.append(outside, strokes, fills, inside, labels);
+  world.append(outside, strokes, fills, inside, over, labels);
 }
