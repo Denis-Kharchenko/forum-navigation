@@ -35,3 +35,4 @@
 .lbl--zone .t1, .lbl--zone .t2 { fill: var(--zc); }
 .lbl--zone.is-active .t1, .lbl--zone.is-active .t2 { fill: #fff; }
 .lbl--zone.is-outside.is-active .t1, .lbl--zone.is-outside.is-active .t2 { fill: var(--zc); }
+.hall-edge { fill: none; stroke: var(--blue, #2450EC); stroke-width: 3; }
