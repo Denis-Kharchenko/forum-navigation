@@ -508,7 +508,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
   <main class="main">
     <!-- ===== 01 Навигация ===== -->
     <section class="view" id="view-nav" role="tabpanel" aria-labelledby="tab-nav">
-      <div class="plan sb-open" id="plan">
+      <div class="plan" id="plan">
         <svg class="plan__svg" id="planSvg" role="img" aria-label="План этажа. Перетаскивайте и масштабируйте пальцами">
           <g id="world"></g>
         </svg>
@@ -712,10 +712,30 @@ const plan = (() => {
     x = Wd <= aw ? l + (aw - Wd) / 2 : Math.min(l + m, Math.max(l + aw - Wd - m, x));
     y = Hd <= ah ? top() + (ah - Hd) / 2 : Math.min(top() + m, Math.max(H() - Hd - m, y));
   }
-  function fit(anim = true) {
+  // Что показывать при открытии этажа: само здание (стены), а не весь участок с двором и террасами;
+  // точка «Вы здесь» на этом этаже всегда попадает в кадр
+  function homeBox() {
+    const F = dims(), xs = [], ys = [];
+    const add = (px, py) => { xs.push(px); ys.push(py); };
+    if (F.outline) F.outline.forEach(([px, py]) => add(px, py));
+    else if (F.masses) F.masses.forEach(([mx, my, mw, mh]) => { add(mx, my); add(mx + mw, my + mh); });
+    if (!xs.length) return null;
+    if (floor === KIOSK.floor && PATHS[KIOSK.floor]) { add(KIOSK.x - 170, KIOSK.y - 40); add(KIOSK.x + 40, KIOSK.y + 40); }
+    const x0 = Math.min(...xs), y0 = Math.min(...ys);
+    return [x0, y0, Math.max(...xs) - x0, Math.max(...ys) - y0];
+  }
+  // whole — весь этаж (кнопка «Показать весь этаж»), иначе — здание
+  function fit(anim = true, whole = false) {
     const { w, h } = dims();
-    base = Math.min(availW() / w, (H() - top()) / h) * 0.94;
-    s = base; clamp(); apply(anim);
+    base = Math.min(availW() / w, (H() - top()) / h) * 0.94;   // меньше этого не отдаляем
+    const hb = !whole && homeBox();
+    if (!hb) { s = base; clamp(); apply(anim); return; }
+    const [bx, by, bw, bh] = hb;
+    const aw = availW() - ($('.zoom').offsetWidth + 16);   // справа — кнопки масштаба, здание под них не заходит
+    s = Math.max(base, Math.min(aw / bw, (H() - top()) / bh) * 0.92);
+    x = left() + aw / 2 - (bx + bw / 2) * s;
+    y = (H() + top()) / 2 - (by + bh / 2) * s;
+    clamp(); apply(anim);
   }
   function zoomAt(f, cx = left() + availW() / 2, cy = H() / 2, anim = false) {
     const ns = Math.min(base * 5, Math.max(base, s * f));
@@ -767,12 +787,13 @@ const plan = (() => {
 
   $('#zoomIn').addEventListener('click', () => zoomAt(1.4, undefined, undefined, true));
   $('#zoomOut').addEventListener('click', () => zoomAt(1 / 1.4, undefined, undefined, true));
-  $('#zoomFit').addEventListener('click', () => fit(true));
+  $('#zoomFit').addEventListener('click', () => fit(true, true));
 
   return { setFloor, fit, focus, get floor() { return floor; } };
 })();
 
 /* --- Сайдбар --- */
+const SIDEBAR_DEFAULT = () => matchMedia('(max-width: 600px)').matches;   // при старте и после сброса
 function setSidebar(open, refit = true) {
   $('#plan').classList.toggle('sb-open', open);
   $('#sbToggle').setAttribute('aria-expanded', String(open));
@@ -1131,14 +1152,10 @@ function resetKiosk() {
   resetCards();
   prog.track = TRACKS[0].id;
   $$('#progChips .chip').forEach((x, i) => x.setAttribute('aria-selected', String(i === 0)));
-  function setTimelineColor(id) {
-  const el = $('#timeline'), c = trackColor(id);
-  el.style.setProperty('--c', c); el.style.setProperty('--ct', trackInk(c));
-}
-setTimelineColor(prog.track);
+  setTimelineColor(prog.track);
   renderFloor(KIOSK.floor);
   showView('nav');
-  setSidebar(true);
+  setSidebar(SIDEBAR_DEFAULT());
 }
 function bumpIdle() { clearTimeout(idleTimer); idleTimer = setTimeout(resetKiosk, IDLE_SECONDS * 1000); }
 ['pointerdown', 'keydown', 'wheel'].forEach(ev => window.addEventListener(ev, bumpIdle, { passive: true }));
@@ -1148,7 +1165,7 @@ document.addEventListener('contextmenu', e => e.preventDefault());
 installPlanDefs($('#planSvg'));
 renderFloor(KIOSK.floor);
 showView(location.hash.slice(1) || 'nav');
-setSidebar(true);
+setSidebar(SIDEBAR_DEFAULT());
 bumpIdle();
 </script>
 </body>
