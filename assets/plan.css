@@ -40,3 +40,8 @@
 /* Заглушка: план этажа ещё не готов */
 .ph-box { fill: #fff; stroke: var(--line, #b9c1d9); stroke-width: 3; stroke-dasharray: 14 10; }
 .ph-text { font-family: var(--f-display); font-weight: 700; text-transform: uppercase; font-size: 46px; fill: var(--ink-3, #7a7a85); text-anchor: middle; dominant-baseline: central; letter-spacing: .04em; }
+
+/* Перила (куда идти не нужно) и колонны */
+.railing-line { fill: none; stroke: #4a4a55; stroke-width: 4; stroke-linejoin: round; }
+.railing-posts { fill: none; stroke: #4a4a55; stroke-width: 11; stroke-linecap: round; stroke-dasharray: 0.1 30; }
+.column { fill: #4a4a55; }

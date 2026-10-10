@@ -172,7 +172,14 @@ function renderPlan(world, f, { clickable = r => r.list, onSelect = () => {} } =
   if (fl.walls) over.appendChild(svgEl('polyline', { points: pts(fl.walls), class: 'wall-line' }));
   else if (fl.outline) over.appendChild(svgEl('polygon', { points: pts(fl.outline), class: 'wall-line' }));
   // Линии поверх помещений (например, граница бельэтажа)
-  (fl.lines || []).forEach(l => over.appendChild(svgEl('polyline', { points: pts(l.points), class: l.cls })));
+  (fl.lines || []).forEach(l => {
+    if (l.cls === 'railing') {   // перила: линия со столбиками
+      over.appendChild(svgEl('polyline', { points: pts(l.points), class: 'railing-line' }));
+      over.appendChild(svgEl('polyline', { points: pts(l.points), class: 'railing-posts' }));
+    } else over.appendChild(svgEl('polyline', { points: pts(l.points), class: l.cls }));
+  });
+  // колонны
+  (fl.columns || []).forEach(([x, y]) => over.appendChild(svgEl('rect', { x: x - 6, y: y - 6, width: 12, height: 12, class: 'column' })));
   // Террасы и крыши — снаружи корпуса, рисуем первыми
   const outside = svgEl('g'), inside = svgEl('g'), labels = svgEl('g');
   ROOMS.filter(r => r.floor === f).forEach(r => {
